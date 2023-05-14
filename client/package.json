@@ -16,6 +16,7 @@
         "aws-amplify": "^5.2.1",
         "vue": "^3.3.2",
         "vue-router": "^4.2.0",
+        "vuedraggable": "^4.1.0",
         "vuetify": "^3.2.4"
     },
     "devDependencies": {
