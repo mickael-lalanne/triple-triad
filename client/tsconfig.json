@@ -10,5 +10,8 @@
     ],
     "compilerOptions": {
         "skipLibCheck": true
-    }
+    },
+    "types": [
+        "vuetify"
+    ]
 }
