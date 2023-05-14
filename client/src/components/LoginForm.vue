@@ -4,11 +4,11 @@ import '@aws-amplify/ui-vue/styles.css';
 </script>
 
 <template>
-  <authenticator>
-    <template v-slot="{ user, signOut }">
-      <h1>Hello {{ user.username }}!</h1>
-      <button @click="signOut">Sign Out</button>
-      <div> {{ JSON.stringify(user) }}</div>
-    </template>
-  </authenticator>
+    <authenticator>
+        <template v-slot="{ user, signOut }">
+            <h1>Hello {{ user.username }}!</h1>
+            <button @click="signOut">Sign Out</button>
+            <div>{{ JSON.stringify(user) }}</div>
+        </template>
+    </authenticator>
 </template>
