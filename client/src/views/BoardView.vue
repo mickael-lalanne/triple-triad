@@ -2,15 +2,22 @@
     <main>
         <!-- BOARD -->
         <div class="board-container">
-            <div v-for="col in 3" :key="col" class="board-column d-flex justify-center">
+            <div v-for="line in 3" :key="line" class="board-line d-flex justify-center">
                 <div v-for="cell in 3" :key="cell" class="board-cell">
                     <!-- Card in cell -->
-                    <div v-if="hasCard(col, cell)" class="board-cell-card">
-                        <div>Name: {{ getCard(col, cell).name }}</div>
-                        <div>topValue: {{ getCard(col, cell).topValue }}</div>
-                        <div>bottomValue: {{ getCard(col, cell).bottomValue }}</div>
-                        <div>leftValue: {{ getCard(col, cell).leftValue }}</div>
-                        <div>rightValue: {{ getCard(col, cell).rightValue }}</div>
+                    <div
+                        v-if="hasCard(line, cell)"
+                        class="board-cell-card"
+                        :class="{
+                            'board-cell-card-player-0': !getCardOwner(line, cell),
+                            'board-cell-card-player-1': getCardOwner(line, cell)
+                        }"
+                    >
+                        <div>Name: {{ getCard(line, cell).name }}</div>
+                        <div>topValue: {{ getCard(line, cell).topValue }}</div>
+                        <div>bottomValue: {{ getCard(line, cell).bottomValue }}</div>
+                        <div>leftValue: {{ getCard(line, cell).leftValue }}</div>
+                        <div>rightValue: {{ getCard(line, cell).rightValue }}</div>
                     </div>
 
                     <!-- No card in cell (drop zone) -->
@@ -18,7 +25,7 @@
                         v-else
                         class="board-cell-drop-zone"
                         :group="{ name: 'card', pull: false, put: true }"
-                        @add="onCardDropped($event, col, cell)"
+                        @add="onCardDropped($event, line, cell)"
                     >
                         <template #item="{ element }">
                             <div class="card">{{ element.name }}</div>
@@ -42,7 +49,11 @@
                     class="deck-card"
                     :class="{ 'deck-card-disabled': cardsPlayed[playerTurn].includes(element.id) }"
                 >
-                    {{ element.name }}
+                    <div>{{ element.name }}</div>
+                    <div>topValue: {{ element.topValue }}</div>
+                    <div>bottomValue: {{ element.bottomValue }}</div>
+                    <div>leftValue: {{ element.leftValue }}</div>
+                    <div>rightValue: {{ element.rightValue }}</div>
                 </div>
             </template>
         </draggable>
@@ -54,13 +65,18 @@ import type { Card } from '@/models/Card';
 import { tmpDeck1 } from '@/models/Card';
 import draggable from 'vuedraggable';
 
+interface BoardCell {
+    card: Card;
+    player:  0 | 1; // which player owns the card
+}
+
 export default {
     data() {
         return {
             tmpDeck: tmpDeck1 as Card[],
             playerTurn: 0 as 0 | 1,
             drag: false as boolean,
-            boardCards: [] as Card[][],
+            boardCards: [] as BoardCell[][],
             cardsPlayed: [[], []] as number[][] // id of all the played cards for each player
         };
     },
@@ -72,44 +88,109 @@ export default {
          * Called when a card has been played
          * Place it into the board, check values and change player turn
          * @param {SortableEvent} sortableEvent 
-         * @param {number} col the column where the card has been dropped
+         * @param {number} line the line where the card has been dropped
          * @param {number} cell the cell where the card has been dropped
          */
-        onCardDropped(sortableEvent: any, col: number, cell: number): void {
+        onCardDropped(sortableEvent: any, line: number, cell: number): void {
             // First, place the card in the board
             const cardDropped: Card = this.tmpDeck[sortableEvent.oldIndex];
     
-            if (!this.boardCards[col]) {
-                this.boardCards[col] = []
+            if (!this.boardCards[line]) {
+                this.boardCards[line] = []
             };
 
-            this.boardCards[col][cell] = cardDropped;
+            this.boardCards[line][cell] = { card: cardDropped, player: this.playerTurn };
             this.cardsPlayed[this.playerTurn].push(cardDropped.id);
 
             // Now, check the card values
+            this.checkCardValues(cardDropped, line, cell);
 
             // Finally, change the player turn
             this.changePlayerTurn();
         },
         /**
-         * Get the card for the specified location
-         * @param {number} col collumn where the card is placed
-         * @param {number} cell where the card is placed
+         * Called when a card has been played
+         * Check the value of the cards arround it
+         * @param {Card} card the card that was just played 
+         * @param {number} line the line where the card has been dropped
+         * @param {number} cell the cell where the card has been dropped
+         */
+        checkCardValues(card: Card, line: number, cell: number): void {
+            // CHECK TOP VALUE
+            if (
+                line !== 1 && // don't check if no card can be placed on top
+                this.boardCards[line - 1] &&
+                this.boardCards[line - 1][cell] && // don't check if no card is placed on top yet
+                this.boardCards[line - 1][cell].player !== this.playerTurn // don't check if the card on top is already owned by the player
+            ) {
+                const cardAtTop: Card = this.boardCards[line - 1][cell].card;
+                if (cardAtTop.bottomValue < card.topValue) {
+                    this.boardCards[line - 1][cell].player = this.playerTurn;
+                }
+            }
+            // CHECK BOTTOM VALUE
+            if (
+                line !== 3 && // don't check if no card can be placed on bottom
+                this.boardCards[line + 1] &&
+                this.boardCards[line + 1][cell] && // don't check if no card is placed on bottom yet
+                this.boardCards[line + 1][cell].player !== this.playerTurn // don't check if the card on bottom is already owned by the player
+            ) {
+                const cardAtBottom: Card = this.boardCards[line - 1][cell].card;
+                if (cardAtBottom.topValue < card.bottomValue) {
+                    this.boardCards[line + 1][cell].player = this.playerTurn;
+                }
+            }
+            // CHECK LEFT VALUE
+            if (
+                cell !== 1 && // don't check if no card can be placed on left
+                this.boardCards[line] &&
+                this.boardCards[line][cell - 1] && // don't check if no card is placed on left yet
+                this.boardCards[line][cell - 1].player !== this.playerTurn // don't check if the card on left is already owned by the player
+            ) {
+                const cardAtLeft: Card = this.boardCards[line][cell - 1].card;
+                if (cardAtLeft.rightValue < card.leftValue) {
+                    this.boardCards[line][cell - 1].player = this.playerTurn;
+                }
+            }
+            // CHECK RIGHT VALUE
+            if (
+                cell !== 3 && // don't check if no card can be placed on right
+                this.boardCards[line] &&
+                this.boardCards[line][cell + 1] && // don't check if no card is placed on right yet
+                this.boardCards[line][cell + 1].player !== this.playerTurn // don't check if the card on right is already owned by the player
+            ) {
+                const cardAtRight: Card = this.boardCards[line][cell + 1].card;
+                if (cardAtRight.leftValue < card.rightValue) {
+                    this.boardCards[line][cell + 1].player = this.playerTurn;
+                }
+            }
+        },
+        /**
+         * Get the card for a specific location
+         * @param {number} line line where the card is placed
+         * @param {number} cell cell where the card is placed
          * @returns {Card} the card object
          */
-        getCard(col: number, cell: number): Card {
-            console.log('#getCard#');
-            console.log(this.boardCards[col] && this.boardCards[col][cell]);
-            return this.boardCards[col] && this.boardCards[col][cell];
+        getCard(line: number, cell: number): Card {
+            return this.boardCards[line] && this.boardCards[line][cell].card;
+        },
+        /**
+         * Get the owner of the card for a specific location
+         * @param {number} line line where the card is placed
+         * @param {number} cell cell where the card is placed
+         * @returns {0 | 1} the player owner of the card
+         */
+        getCardOwner(line: number, cell: number): 0 | 1 {
+            return this.boardCards[line] && this.boardCards[line][cell].player;
         },
         /**
          * Check if a card is placed in the given location
-         * @param {number} col collumn to search
+         * @param {number} line line to search
          * @param {number} cell cell to search
          * @returns {boolean} true if a card is in the cell
          */
-        hasCard(col: number, cell: number): boolean {
-            return this.boardCards[col] && !!this.boardCards[col][cell];
+        hasCard(line: number, cell: number): boolean {
+            return this.boardCards[line] && !!this.boardCards[line][cell];
         },
         changePlayerTurn() {
             this.playerTurn = this.playerTurn ? 0 : 1;
@@ -125,6 +206,16 @@ export default {
     width: 150px;
     margin: 7px;
     position: relative;
+}
+.board-cell-card {
+    width: 100%;
+    height: 100%;
+}
+.board-cell-card-player-0 {
+    box-shadow: 0 0 4pt 3pt blue;
+}
+.board-cell-card-player-1 {
+    box-shadow: 0 0 4pt 3pt green;
 }
 .board-cell-drop-zone {
     position: absolute;
