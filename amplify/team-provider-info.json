@@ -10,6 +10,11 @@
       "StackName": "amplify-tripletriad-dev-100737",
       "StackId": "arn:aws:cloudformation:eu-west-1:800389594316:stack/amplify-tripletriad-dev-100737/664f16b0-f22e-11ed-8b02-06b7c4b4df41",
       "AmplifyAppId": "d3cpavgj521ipl"
+    },
+    "categories": {
+      "auth": {
+        "tripletriad695ad78b": {}
+      }
     }
   }
 }
