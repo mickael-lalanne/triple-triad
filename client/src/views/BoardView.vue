@@ -16,7 +16,7 @@
                     :style="`background-color: ${playerTurn ? 'rgb(var(--v-theme-player2Color))' : 'rgb(var(--v-theme-player1Color))'}`"
                 ></div>
             </div>
-            <v-icon class="header-item replay-icon" icon="mdi-replay"></v-icon>
+            <v-icon class="header-item replay-icon" icon="mdi-replay" @click="replay()"></v-icon>
         </div>
 
         <!-- BOARD -->
@@ -72,6 +72,37 @@
                 </div>
             </template>
         </draggable>
+
+        <!-- GAME ENDED POPUP -->
+        <v-dialog
+            transition="dialog-bottom-transition"
+            v-model="gameEnded"
+            width="auto"
+        >
+            <template v-slot:default="{}">
+                <v-card>
+                    <v-toolbar
+                        :color="winner === 1 ? 'player1Color' : 'player2Color'"
+                        :title="$vuetify.locale.t('$vuetify.board.gameEnded')"
+                    ></v-toolbar>
+                    <v-card-text>
+                        <div class="text-h2 pa-12">{{ $vuetify.locale.t('$vuetify.board.playerWin', winner) }}</div>
+                    </v-card-text>
+                    <v-card-actions class="justify-end">
+                        <!-- Replay -->     
+                        <v-btn @click=replay()>
+                            {{ $vuetify.locale.t('$vuetify.board.replay') }}
+                        </v-btn>
+                        <!-- Back to main menu -->
+                        <RouterLink class="menu-item" to="/">      
+                            <v-btn>
+                                {{ $vuetify.locale.t('$vuetify.board.backToMainMenu') }}
+                            </v-btn>
+                        </RouterLink>
+                    </v-card-actions>
+                </v-card>
+            </template>
+        </v-dialog>
     </main>
 </template>
 
@@ -88,6 +119,8 @@ interface BoardCell {
 export default {
     data() {
         return {
+            gameEnded: false as boolean,
+            winner: null as null | 1 | 2,
             player1Deck: [] as Card[],
             player2Deck: [] as Card[],
             playerTurn: 0 as 0 | 1,
@@ -126,6 +159,9 @@ export default {
 
             // Now, check the card values
             this.checkCardValues(cardDropped, line, cell);
+
+            // Chekc if game is over
+            this.checkWin();
 
             // Finally, change the player turn
             this.changePlayerTurn();
@@ -188,6 +224,44 @@ export default {
             }
         },
         /**
+         * Called at the end of each turn to check if the game is over
+         * Check if game is over and determine who is the winner 
+         */
+        checkWin() {
+            const isGameOver = this.cardsPlayed[0].length + this.cardsPlayed[1].length === 9;
+
+            // Who wins ?
+            if (isGameOver) {
+                let player1Points: number = 0;
+                let player2Points: number = 0;
+                this.boardCards.forEach((line => {
+                    line.forEach(cell => {
+                        if (cell.player === 0) {
+                            player1Points++;
+                        } else {
+                            player2Points++;
+                        }
+                    });
+                }));
+                this.winner = player1Points > player2Points ? 1 : 2;
+                this.gameEnded = true;
+            }
+        },
+        /**
+         * Called when game is over and the user want to replay, or when the replay icon has been clicked
+         * Reset all data to restart a game
+         */
+        replay() {
+            this.winner = null;
+            this.gameEnded = false;
+            this.boardCards = [];
+            this.cardsPlayed = [[], []];
+            this.playerTurn = 0;
+            // Regenerate players deck
+            this.player1Deck = DeckService.generateRandomDeck();
+            this.player2Deck = DeckService.generateRandomDeck();
+        },
+        /**
          * Get the card for a specific location
          * @param {number} line line where the card is placed
          * @param {number} cell cell where the card is placed
@@ -218,8 +292,6 @@ export default {
             this.playerTurn = this.playerTurn ? 0 : 1;
         },
         getCardImage(cardSrc: string): string {
-            console.log('#getCardImage#');
-            console.log(new URL(`./assets/cards/${cardSrc}`, import.meta.url).href);
             return new URL(`./assets/cards/${cardSrc}`, import.meta.url).href;
         }
     }

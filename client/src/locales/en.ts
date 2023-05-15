@@ -12,6 +12,9 @@ export default {
     },
     board: {
         playersTurn: 'Player\'s {0} turn',
+        playerWin: 'Player {0} wins !',
+        replay: 'Play again ?',
+        gameEnded: 'Game ended',
         backToMainMenu: 'Back to main menu'
     }
 }
