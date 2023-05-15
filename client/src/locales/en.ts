@@ -9,5 +9,9 @@ export default {
             deckManagement: 'Deck Management',
             logout: 'Logout',
         }
+    },
+    board: {
+        playersTurn: 'Player\'s {0} turn',
+        backToMainMenu: 'Back to main menu'
     }
 }

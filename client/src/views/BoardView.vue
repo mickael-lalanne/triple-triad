@@ -1,5 +1,24 @@
 <template>
     <main>
+        <!-- HEADER -->
+        <div class="header-container d-flex align-center">
+            <div class="header-item back-to-main-menu">
+                <RouterLink class="menu-item" to="/">      
+                    <v-btn>
+                        {{ $vuetify.locale.t('$vuetify.board.backToMainMenu') }}
+                    </v-btn>
+                </RouterLink>
+            </div>
+            <div class="header-item player-turn">
+                <div>{{ $vuetify.locale.t('$vuetify.board.playersTurn', playerTurn ? 2 : 1) }}</div>
+                <div
+                    class="player-turn-highlight"
+                    :style="`background-color: ${playerTurn ? 'rgb(var(--v-theme-player2Color))' : 'rgb(var(--v-theme-player1Color))'}`"
+                ></div>
+            </div>
+            <v-icon class="header-item replay-icon" icon="mdi-replay"></v-icon>
+        </div>
+
         <!-- BOARD -->
         <div class="board-container">
             <div v-for="line in 3" :key="line" class="board-line d-flex justify-center">
@@ -208,6 +227,38 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.header-container {
+    width: 100%;
+    margin-bottom: 50px;
+    .player-turn {
+        text-align: center;
+    }
+}
+
+.header-item {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+.player-turn-highlight {
+    position: absolute;
+    width: 100px;
+    height: 2px;
+    bottom: -3px;
+}
+
+.header-item:first-child > span { margin-right: auto; }
+
+.header-item:last-child  > span { margin-left: auto;  }
+
+.replay-icon {
+    justify-content: flex-end;
+}
+.back-to-main-menu {
+    justify-content: flex-start;
+}
+
 .board-cell {
     height: 150px;
     width: 150px;
@@ -237,14 +288,10 @@ export default {
 }
 
 .player-1-deck {
-    .deck-card {
-        background-color: rgb(var(--v-theme-player1Color));
-    }
+    background-color: rgb(var(--v-theme-player1Color));
 }
 .player-2-deck {
-    .deck-card {
-        background-color: rgb(var(--v-theme-player2Color));
-    }
+    background-color: rgb(var(--v-theme-player2Color));
 }
 
 
