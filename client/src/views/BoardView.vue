@@ -7,17 +7,13 @@
                     <!-- Card in cell -->
                     <div
                         v-if="hasCard(line, cell)"
-                        class="board-cell-card"
+                        class="board-cell-card d-flex align-center justify-center"
                         :class="{
-                            'board-cell-card-player-0': !getCardOwner(line, cell),
-                            'board-cell-card-player-1': getCardOwner(line, cell)
+                            'board-cell-card-player-1': !getCardOwner(line, cell),
+                            'board-cell-card-player-2': getCardOwner(line, cell)
                         }"
                     >
-                        <div>Name: {{ getCard(line, cell).name }}</div>
-                        <div>topValue: {{ getCard(line, cell).topValue }}</div>
-                        <div>bottomValue: {{ getCard(line, cell).bottomValue }}</div>
-                        <div>leftValue: {{ getCard(line, cell).leftValue }}</div>
-                        <div>rightValue: {{ getCard(line, cell).rightValue }}</div>
+                        <img :src="'/images/cards/' + getCard(line, cell).source"/>
                     </div>
 
                     <!-- No card in cell (drop zone) -->
@@ -37,23 +33,23 @@
 
         <!-- DECK -->
         <draggable
-            v-model="tmpDeck"
+            :list="playerTurn ? player2Deck : player1Deck"
             :group="{ name: 'card', pull: 'clone', put: false }"
             @start="drag = true"
             @end="drag = false"
             item-key="id"
             class="deck-container"
+            :class="{
+                'player-1-deck': !playerTurn,
+                'player-2-deck': playerTurn
+            }"
         >
             <template #item="{ element }">
                 <div
-                    class="deck-card"
+                    class="deck-card d-flex align-center justify-center"
                     :class="{ 'deck-card-disabled': cardsPlayed[playerTurn].includes(element.id) }"
                 >
-                    <div>{{ element.name }}</div>
-                    <div>topValue: {{ element.topValue }}</div>
-                    <div>bottomValue: {{ element.bottomValue }}</div>
-                    <div>leftValue: {{ element.leftValue }}</div>
-                    <div>rightValue: {{ element.rightValue }}</div>
+                    <img :src="'/images/cards/' + element.source"/>
                 </div>
             </template>
         </draggable>
@@ -62,7 +58,7 @@
 
 <script lang="ts">
 import type { Card } from '@/models/Card';
-import { tmpDeck1 } from '@/models/Card';
+import { DeckService } from '@/services/deckService';
 import draggable from 'vuedraggable';
 
 interface BoardCell {
@@ -73,7 +69,8 @@ interface BoardCell {
 export default {
     data() {
         return {
-            tmpDeck: tmpDeck1 as Card[],
+            player1Deck: [] as Card[],
+            player2Deck: [] as Card[],
             playerTurn: 0 as 0 | 1,
             drag: false as boolean,
             boardCards: [] as BoardCell[][],
@@ -82,6 +79,11 @@ export default {
     },
     components: {
         draggable
+    },
+    beforeMount() {
+        // Generate players deck
+        this.player1Deck = DeckService.generateRandomDeck();
+        this.player2Deck = DeckService.generateRandomDeck();
     },
     methods: {
         /**
@@ -93,7 +95,8 @@ export default {
          */
         onCardDropped(sortableEvent: any, line: number, cell: number): void {
             // First, place the card in the board
-            const cardDropped: Card = this.tmpDeck[sortableEvent.oldIndex];
+            const deckPlayed: Card[] = this.playerTurn ? this.player2Deck : this.player1Deck; 
+            const cardDropped: Card = deckPlayed[sortableEvent.oldIndex];
     
             if (!this.boardCards[line]) {
                 this.boardCards[line] = []
@@ -135,7 +138,7 @@ export default {
                 this.boardCards[line + 1][cell] && // don't check if no card is placed on bottom yet
                 this.boardCards[line + 1][cell].player !== this.playerTurn // don't check if the card on bottom is already owned by the player
             ) {
-                const cardAtBottom: Card = this.boardCards[line - 1][cell].card;
+                const cardAtBottom: Card = this.boardCards[line + 1][cell].card;
                 if (cardAtBottom.topValue < card.bottomValue) {
                     this.boardCards[line + 1][cell].player = this.playerTurn;
                 }
@@ -195,13 +198,17 @@ export default {
         changePlayerTurn() {
             this.playerTurn = this.playerTurn ? 0 : 1;
         },
+        getCardImage(cardSrc: string): string {
+            console.log('#getCardImage#');
+            console.log(new URL(`./assets/cards/${cardSrc}`, import.meta.url).href);
+            return new URL(`./assets/cards/${cardSrc}`, import.meta.url).href;
+        }
     }
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .board-cell {
-    background-color: yellow;
     height: 150px;
     width: 150px;
     margin: 7px;
@@ -211,11 +218,11 @@ export default {
     width: 100%;
     height: 100%;
 }
-.board-cell-card-player-0 {
-    box-shadow: 0 0 4pt 3pt blue;
-}
 .board-cell-card-player-1 {
-    box-shadow: 0 0 4pt 3pt green;
+    box-shadow: 0 0 4pt 3pt rgb(var(--v-theme-player1Color));
+}
+.board-cell-card-player-2 {
+    box-shadow: 0 0 4pt 3pt rgb(var(--v-theme-player2Color));
 }
 .board-cell-drop-zone {
     position: absolute;
@@ -228,8 +235,20 @@ export default {
     display: flex;
     margin-top: 50px;
 }
+
+.player-1-deck {
+    .deck-card {
+        background-color: rgb(var(--v-theme-player1Color));
+    }
+}
+.player-2-deck {
+    .deck-card {
+        background-color: rgb(var(--v-theme-player2Color));
+    }
+}
+
+
 .deck-card {
-    background-color: green;
     width: 150px;
     height: 150px;
     cursor: grab;
