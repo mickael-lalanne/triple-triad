@@ -2,21 +2,17 @@
     <div class="menu-container">
         <!-- PLAY -->
         <RouterLink class="menu-item" to="/board">      
-            <v-btn
-                
-                size="x-large"
-            >
+            <v-btn size="x-large">
                 {{ $vuetify.locale.t('$vuetify.home.menu.play') }}
             </v-btn>
         </RouterLink>
 
         <!-- DECK MANAGEMENT -->
-        <v-btn
-            class="menu-item"
-            size="x-large"
-        >
-            {{ $vuetify.locale.t('$vuetify.home.menu.deckManagement') }}
-        </v-btn>
+        <RouterLink class="menu-item" to="/decks">  
+            <v-btn size="x-large">
+                {{ $vuetify.locale.t('$vuetify.home.menu.deckManagement') }}
+            </v-btn>
+        </RouterLink>
         
         <!-- LOGOUT -->
         <v-btn

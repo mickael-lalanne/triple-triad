@@ -83,3 +83,9 @@ nav a:first-of-type {
     }
 }
 </style>
+
+<style>
+html {
+    overflow: auto !important;
+}
+</style>

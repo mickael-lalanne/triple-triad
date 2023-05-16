@@ -16,5 +16,17 @@ export default {
         replay: 'Play again ?',
         gameEnded: 'Game ended',
         backToMainMenu: 'Back to main menu'
+    },
+    deck: {
+        oneStarCards: '1 star cards',
+        starsCards: '{0} stars cards',
+        nameField: 'Deck name',
+        createTitle: 'Deck Creation',
+        defaultDeckName: 'Deck n°{0}',
+        createDeck: 'Create deck',
+        updateDeck: 'Update deck'
+    },
+    shared: {
+        cancel: 'Cancel'
     }
 }
