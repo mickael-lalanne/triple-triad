@@ -4,7 +4,6 @@ import HomeMenu from '@/components/HomeMenu.vue';
 
 <template>
     <main>
-        <h1>{{ $vuetify.locale.t('$vuetify.home.title') }}</h1>
         <HomeMenu />
     </main>
 </template>

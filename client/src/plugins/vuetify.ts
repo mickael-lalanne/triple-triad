@@ -30,13 +30,12 @@ export default createVuetify({
         themes: {
             tripleTriadTheme: {
                 colors: {
-                    primary: '#5e548e',
-                    secondary: '#9f86c0',
-                    light: '#be95c4',
-                    light2: '#e0b1cb',
-                    dark: '#231942',
-                    player1Color: '#A2D2FF',
-                    player2Color: '#FFAFCC',
+                    primary: '#2CD3E1',
+                    secondary: '#F266AB',
+                    tertiary: '#FFB84C',
+                    player1Color: '#2CD3E1',
+                    player2Color: '#F266AB',
+                    black: '#222831'
                 }
             }
         }
