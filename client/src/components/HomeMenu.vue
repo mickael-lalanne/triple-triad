@@ -69,7 +69,7 @@ $card-border-radius: 20px;
         cursor: pointer;
         font-family: 'Roboto', sans-serif;
         font-size: 14px;
-        margin-right: 20px;
+        margin-right: 25px;
         &:hover {
             color: rgb(var(--v-theme-tertiary));
         }

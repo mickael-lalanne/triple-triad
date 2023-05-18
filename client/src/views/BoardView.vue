@@ -1,26 +1,8 @@
 <template>
-    <main>
-        <!-- HEADER -->
-        <div class="header-container d-flex align-center">
-            <div class="header-item back-to-main-menu">
-                <RouterLink class="menu-item" to="/">      
-                    <v-btn>
-                        {{ $vuetify.locale.t('$vuetify.board.backToMainMenu') }}
-                    </v-btn>
-                </RouterLink>
-            </div>
-            <div class="header-item player-turn">
-                <div>{{ $vuetify.locale.t('$vuetify.board.playersTurn', playerTurn ? 2 : 1) }}</div>
-                <div
-                    class="player-turn-highlight"
-                    :style="`background-color: ${playerTurn ? 'rgb(var(--v-theme-player2Color))' : 'rgb(var(--v-theme-player1Color))'}`"
-                ></div>
-            </div>
-            <v-icon class="header-item replay-icon" icon="mdi-replay" @click="replay()"></v-icon>
-        </div>
-
+    <main class="board-view-container">
+        <HomeButton />
         <!-- BOARD -->
-        <div class="board-container">
+        <div class="board-container" :style="`margin-top: -${HOME_HEADER_HEIGHT}px`">
             <div v-for="line in 3" :key="line" class="board-line d-flex justify-center">
                 <div v-for="cell in 3" :key="cell" class="board-cell">
                     <!-- Card in cell -->
@@ -50,55 +32,79 @@
             </div>
         </div>
 
-        <!-- DECK -->
-        <draggable
-            :list="playerTurn ? player2Deck : player1Deck"
-            :group="{ name: 'card', pull: 'clone', put: false }"
-            @start="drag = true"
-            @end="drag = false"
-            item-key="id"
-            class="deck-container"
+        <div class="footer-spacer"></div>
+
+        <div
+            class="footer-container"
             :class="{
-                'player-1-deck': !playerTurn,
-                'player-2-deck': playerTurn
+                'player-1-footer-container': !playerTurn,
+                'player-2-footer-container': playerTurn
             }"
         >
-            <template #item="{ element }">
-                <div
-                    class="deck-card d-flex align-center justify-center"
-                    :class="{ 'deck-card-disabled': cardsPlayed[playerTurn].includes(element.id) }"
-                >
-                    <img :src="'/images/cards/' + element.source"/>
+            <!-- Player turn indicator -->
+            <div
+                class="player-turn-container"
+            >
+                <div class="player-turn-content">
+                    {{ $vuetify.locale.t('$vuetify.board.playersTurn', playerTurn ? 2 : 1) }}
                 </div>
-            </template>
-        </draggable>
+            </div>
+
+            <!-- DECK -->
+            <draggable
+                :list="playerTurn ? player2Deck : player1Deck"
+                :group="{ name: 'card', pull: 'clone', put: false }"
+                @start="drag = true"
+                @end="drag = false"
+                item-key="id"
+                class="deck-container"
+                :class="{
+                    'player-1-deck': !playerTurn,
+                    'player-2-deck': playerTurn
+                }"
+            >
+                <template #item="{ element }">
+                    <div
+                        class="deck-card d-flex align-center justify-center"
+                        :class="{ 'deck-card-disabled': cardsPlayed[playerTurn].includes(element.id) }"
+                    >
+                        <img :src="'/images/cards/' + element.source"/>
+                    </div>
+                </template>
+            </draggable>
+        </div>
 
         <!-- GAME ENDED POPUP -->
         <v-dialog
             transition="dialog-bottom-transition"
             v-model="gameEnded"
-            width="auto"
+            :width="600"
         >
             <template v-slot:default="{}">
-                <v-card>
+                <v-card
+                    class="winner-popup-container"
+                    :class="{
+                        'winner-1-popup-container': winner === 1,
+                        'winner-2-popup-container': winner === 2
+                    }">
                     <v-toolbar
-                        :color="winner === 1 ? 'player1Color' : 'player2Color'"
+                        :color="winner === 1 ? 'primary' : 'secondary'"
                         :title="$vuetify.locale.t('$vuetify.board.gameEnded')"
                     ></v-toolbar>
                     <v-card-text>
-                        <div class="text-h2 pa-12">{{ $vuetify.locale.t('$vuetify.board.playerWin', winner) }}</div>
+                        <div class="winner-text">{{ $vuetify.locale.t('$vuetify.board.playerWin', winner) }}</div>
                     </v-card-text>
-                    <v-card-actions class="justify-end">
-                        <!-- Replay -->     
-                        <v-btn @click=replay()>
-                            {{ $vuetify.locale.t('$vuetify.board.replay') }}
-                        </v-btn>
+                    <v-card-actions class="winner-buttons-container">
                         <!-- Back to main menu -->
-                        <RouterLink class="menu-item" to="/">      
+                        <RouterLink class="winner-button back-button" to="/">      
                             <v-btn>
                                 {{ $vuetify.locale.t('$vuetify.board.backToMainMenu') }}
                             </v-btn>
                         </RouterLink>
+                        <!-- Replay -->     
+                        <div class="winner-button replay-button" @click=replay()>
+                            {{ $vuetify.locale.t('$vuetify.board.replay') }}
+                        </div>
                     </v-card-actions>
                 </v-card>
             </template>
@@ -110,6 +116,7 @@
 import type { Card } from '@/models/Card';
 import { DeckService } from '@/services/deckService';
 import draggable from 'vuedraggable';
+import HomeButton, { HOME_HEADER_HEIGHT } from '@/components/HomeButton.vue';
 
 interface BoardCell {
     card: Card;
@@ -119,8 +126,9 @@ interface BoardCell {
 export default {
     data() {
         return {
+            HOME_HEADER_HEIGHT: HOME_HEADER_HEIGHT,
             gameEnded: false as boolean,
-            winner: null as null | 1 | 2,
+            winner: 0 as null | 1 | 2,
             player1Deck: [] as Card[],
             player2Deck: [] as Card[],
             playerTurn: 0 as 0 | 1,
@@ -129,9 +137,7 @@ export default {
             cardsPlayed: [[], []] as number[][] // id of all the played cards for each player
         };
     },
-    components: {
-        draggable
-    },
+    components: { draggable, HomeButton },
     beforeMount() {
         // Generate players deck
         this.player1Deck = DeckService.generateRandomDeck();
@@ -299,36 +305,20 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.header-container {
-    width: 100%;
-    margin-bottom: 50px;
-    .player-turn {
-        text-align: center;
-    }
-}
+$footer-height: 200px;
 
-.header-item {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  position: relative;
+.board-view-container {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
-.player-turn-highlight {
-    position: absolute;
-    width: 100px;
-    height: 2px;
-    bottom: -3px;
-}
-
-.header-item:first-child > span { margin-right: auto; }
-
-.header-item:last-child  > span { margin-left: auto;  }
-
-.replay-icon {
-    justify-content: flex-end;
-}
-.back-to-main-menu {
-    justify-content: flex-start;
+.board-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .board-cell {
@@ -336,34 +326,85 @@ export default {
     width: 150px;
     margin: 7px;
     position: relative;
+    transition: all .2s ease-in-out;
+    &:hover {
+        transform: rotateY(20deg) skewY(-2deg)
+    }
 }
 .board-cell-card {
     width: 100%;
     height: 100%;
+    user-select: none;
+    pointer-events: none;
 }
 .board-cell-card-player-1 {
-    box-shadow: 0 0 4pt 3pt rgb(var(--v-theme-player1Color));
+    box-shadow: 0 0 4pt 3pt rgb(var(--v-theme-primary));
 }
 .board-cell-card-player-2 {
-    box-shadow: 0 0 4pt 3pt rgb(var(--v-theme-player2Color));
+    box-shadow: 0 0 4pt 3pt rgb(var(--v-theme-secondary));
 }
 .board-cell-drop-zone {
-    position: absolute;
-    background-color: red;
+    position: relative;
+    background-image: linear-gradient(to right bottom, #222831, #54575f, #8a8b91, #c3c3c6, #ffffff);
+    opacity: 0.3;
     height: 100%;
     width: 100%;
-    top: 0;
+}
+.footer-container {
+    margin-top: 50px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: $footer-height;
+}
+.footer-spacer {
+    height: $footer-height;
+}
+
+.player-turn-container {
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    top: -27px;
+}
+.player-1-footer-container .player-turn-content{
+    color: rgb(var(--v-theme-primary));
+    outline: 2px solid rgb(var(--v-theme-primary));
+}
+.player-2-footer-container .player-turn-content {
+    color: rgb(var(--v-theme-secondary));
+    outline: 2px solid rgb(var(--v-theme-secondary));
+}
+.player-turn-content {
+    padding: 10px;
+    width: fit-content;
+    margin: auto;
+    background-color: white;
+    border-radius: 10px;
+    font-size: 20px;
+}
+.replay-icon-container {
+    position: absolute;
+    right: 20px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.replay-icon {
 }
 .deck-container {
     display: flex;
-    margin-top: 50px;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
 }
 
 .player-1-deck {
-    background-color: rgb(var(--v-theme-player1Color));
+    background-color: rgb(var(--v-theme-primary));
 }
 .player-2-deck {
-    background-color: rgb(var(--v-theme-player2Color));
+    background-color: rgb(var(--v-theme-secondary));
 }
 
 
@@ -371,6 +412,12 @@ export default {
     width: 150px;
     height: 150px;
     cursor: grab;
+    img {
+        transition: all .2s ease-in-out;
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
 }
 .deck-card-disabled {
     opacity: 0.5;
@@ -381,5 +428,103 @@ export default {
     -moz-user-drag: none;
     -o-user-drag: none;
     user-drag: none;
+}
+.winner-popup-container {
+    height: 400px;
+}
+.winner-1-popup-container .replay-button {
+    background-color: rgb(var(--v-theme-primary));
+    &:hover {
+        // Glow effect
+        -webkit-box-shadow:0px 0px 25px 0px rgb(var(--v-theme-primary));
+        -moz-box-shadow: 0px 0px 25px 0px rgb(var(--v-theme-primary));
+        box-shadow: 0px 0px 25px 0px rgb(var(--v-theme-primary));
+    }
+}
+.winner-2-popup-container .replay-button {
+    background-color: rgb(var(--v-theme-secondary));
+    &:hover {
+        // Glow effect
+        -webkit-box-shadow:0px 0px 25px 0px rgb(var(--v-theme-secondary));
+        -moz-box-shadow: 0px 0px 25px 0px rgb(var(--v-theme-secondary));
+        box-shadow: 0px 0px 25px 0px rgb(var(--v-theme-secondary));
+    }
+}
+.winner-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.winner-text {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    font-weight: 400;
+}
+.winner-button {
+    border-radius: 10px;
+    margin: 0px 25px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.replay-button {
+    animation: highlight 1.5s infinite;
+    color: white;
+    height: 50px;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 20px;
+    transition: all .3s ease-in-out;
+}
+.back-button {
+    color: rgb(var(--v-theme-black));
+    border: 1px solid rgb(var(--v-theme-black));
+    height: 35px;
+    font-size: 14px;
+}
+
+$highlight-scale-start: scale(1.0);
+$highlight-scale-end: scale(1.2);
+@keyframes highlight {
+    0% {
+        -ms-transform: $highlight-scale-start;
+        -moz-transform: $highlight-scale-start;
+        -webkit-transform: $highlight-scale-start;
+        -o-transform: $highlight-scale-start;
+        transform: $highlight-scale-start;
+    }
+    50% {
+        -ms-transform: $highlight-scale-end;
+        -moz-transform: $highlight-scale-end;
+        -webkit-transform: $highlight-scale-end;
+        -o-transform: $highlight-scale-end;
+        transform: $highlight-scale-end;
+    }
+    100% {
+        -ms-transform: $highlight-scale-start;
+        -moz-transform: $highlight-scale-start;
+        -webkit-transform: $highlight-scale-start;
+        -o-transform: $highlight-scale-start;
+        transform: $highlight-scale-start;
+    }
+}
+</style>
+
+<style lang="scss">
+.winner-buttons-container .back-button .v-btn__content  {
+    font-size: 14px;
+    text-transform: none;
+    font-family: 'Roboto', sans-serif;
+}
+.winner-popup-container .v-toolbar-title {
+    color: white;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
 }
 </style>

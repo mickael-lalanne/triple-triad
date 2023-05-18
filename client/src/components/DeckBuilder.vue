@@ -1,76 +1,90 @@
 <template>
-    <main>
-        <div class="builder-container">
-            <!-- ALL CARDS LIST (sorted by stars) -->
-            <v-expansion-panels variant="accordion" multiple v-model="starPanels">
-                <v-expansion-panel
-                    v-for="(cards, i) in allCards"
-                    :key="i"
-                    :value="i"
-                    :title="i === 0 ? $vuetify.locale.t('$vuetify.deck.oneStarCards') : $vuetify.locale.t('$vuetify.deck.starsCards', i + 1)"
-                >
-                    <v-expansion-panel-text>
-                        <div class="d-flex star-category">
-                            <div
-                                v-for="card in cards"
-                                :key="card.id"
-                                class="card-container"
-                                :class="{ 'card-container-disabled': isCardChoosen(i + 1) }"
-                            >
-                                <img @click="onCardSelected(card)" :src="'/images/cards/' + card.source"/>
-                            </div>
-                        </div>
-                    </v-expansion-panel-text>
-                </v-expansion-panel>
-            </v-expansion-panels>
-            <!-- CREATING DECK -->
-            <div class="creating-deck-container-spacer"></div>
-            <div class="creating-deck-container d-flex align-center justify-center">
-                <!-- DECK NAME -->
-                <input v-model="deckName" class="deck-name" placeholder="Deck name" title="input tiel">
-
-                <div class="d-flex align-center justify-center">
-                    <!-- DECK CARDS -->
-                    <div
-                        v-for="i in 5" :key="i" class="card-slot"
-                        @mouseenter="deckCardHover=i"
-                        @mouseleave="deckCardHover = null"
-                        :class="{ 'card-slot-empty': !isCardChoosen(i) }"
-                    >
-                        <img
-                            v-if="isCardChoosen(i)"
-                            :src="'/images/cards/' + getCardSource(i)"
-                        />
-                        <!-- Card remover -->
-                        <div v-if="isCardChoosen(i) && deckCardHover === i" class="card-remover d-flex align-center justify-center">
-                            <v-icon
-                                class="remove-icon"
-                                :size="70"
-                                icon="mdi-selection-ellipse-remove"
-                                color="white"
-                                @click="removeCardFromDeck(i)"
-                            ></v-icon>
-                            <div class="remove-background"></div>
+    <div class="builder-container">
+        <!-- ALL CARDS LIST (sorted by stars) -->
+        <v-expansion-panels class="panels-container" variant="accordion" multiple v-model="starPanels">
+            <v-expansion-panel v-for="(cards, i) in allCards" :key="i" :value="i">
+                <v-expansion-panel-title class="builder-panel-title">
+                    <v-icon
+                        v-for="star in i + 1"
+                        :key="star"
+                        :size="25"
+                        icon="mdi-star-circle"
+                        color="#DE970B"
+                    ></v-icon>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text class="panel-content">
+                    <div class="d-flex star-category">
+                        <div
+                            v-for="card in cards"
+                            :key="card.id"
+                            class="card-container"
+                            :class="{ 'card-container-disabled': isCardChoosen(i + 1) }"
+                        >
+                            <img @click="onCardSelected(card)" :src="'/images/cards/' + card.source"/>
                         </div>
                     </div>
-                    <!-- ACTIONS BUTTON -->
-                    <div class="deck-actions">
-                        <v-btn @click="createDeck" :disabled="selectedCards.length !== 5">
-                            {{ editing
-                                ? $vuetify.locale.t('$vuetify.deck.updateDeck')
-                                : $vuetify.locale.t('$vuetify.deck.createDeck')
-                            }}
-                        </v-btn>
-                        <v-btn @click="$emit(ETripleTriadEvent.CancelDeck)">
-                            {{ $vuetify.locale.t('$vuetify.shared.cancel') }}
-                        </v-btn>
-                        <!-- <v-btn @click="resetDeck">Reset</v-btn> -->
-                        <!-- <v-btn @click="resetDeck">Reset</v-btn> -->
+                </v-expansion-panel-text>
+            </v-expansion-panel>
+        </v-expansion-panels>
+        <!-- CREATING DECK -->
+        <div class="creating-deck-container d-flex align-center justify-center">
+            <!-- DECK NAME -->
+            <input v-model="deckName" class="deck-name" placeholder="Deck name" title="input tiel">
+
+            <div class="d-flex align-center justify-center" style="position: relative">
+                <!-- DECK CARDS -->
+                <div
+                    v-for="i in 5" :key="i" class="card-slot"
+                    @mouseenter="deckCardHover=i"
+                    @mouseleave="deckCardHover = null"
+                    :class="{ 'card-slot-empty': !isCardChoosen(i) }"
+                >
+                    <img
+                        v-if="isCardChoosen(i)"
+                        :src="'/images/cards/' + getCardSource(i)"
+                    />
+                    <!-- Card remover -->
+                    <div v-if="isCardChoosen(i) && deckCardHover === i" class="card-remover d-flex align-center justify-center">
+                        <v-icon
+                            class="remove-icon"
+                            :size="70"
+                            icon="mdi-selection-ellipse-remove"
+                            color="white"
+                            @click="removeCardFromDeck(i)"
+                        ></v-icon>
+                        <div class="remove-background"></div>
+                    </div>
+                </div>
+                <!-- ACTIONS BUTTON -->
+                <div class="deck-actions">
+                    <!-- Save button -->
+                    <div
+                        class="deck-action-button"
+                        @click="createDeck"
+                        :class="{ 'deck-action-button-disabled' : selectedCards.length !== 5}"
+                    >
+                        <div class="button-icon d-flex justify-center">
+                            <v-icon
+                                :size="25"
+                                icon="mdi-content-save"
+                                color="white"
+                        ></v-icon>
+                        </div>
+                    </div>
+                    <!-- Cancel button -->
+                    <div class="deck-action-button" @click="$emit(ETripleTriadEvent.CancelDeck)">
+                        <div class="button-icon d-flex justify-center">
+                            <v-icon
+                                :size="25"
+                                icon="mdi-cancel"
+                                color="white"
+                        ></v-icon>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 </template>
 
 <script lang="ts">
@@ -141,7 +155,38 @@ export default {
 </script>
 
 <style scoped lang="scss">
-$creating-deck-height: 200px;
+$header-height: 64px;
+$creating-deck-height: 256px;
+$card-container-height: calc(#{$header-height} + #{$creating-deck-height});
+$deck-actions-width: 125px;
+
+.builder-container {
+    overflow: auto;
+    height: calc(100% - $card-container-height);
+    &::-webkit-scrollbar {
+        width: 5px;
+    }
+    &::-webkit-scrollbar-track {
+        background: white;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: rgb(var(--v-theme-tertiary));
+        border-radius: 10px;
+    }
+}
+.panels-container {
+    padding: 50px 20%;
+}
+.panels-container,
+.panel-content {
+
+    background-color: rgb(var(--v-theme-black));
+}
+.builder-panel-title {
+    min-height: 30px !important;
+    height: 30px;
+}
 
 .star-category {
     flex-wrap: wrap;
@@ -167,7 +212,6 @@ $creating-deck-height: 200px;
             transform: unset;
         }
     }
-
 }
 
 .creating-deck-container {
@@ -177,11 +221,11 @@ $creating-deck-height: 200px;
     left: 0;
     z-index: 1;
     min-height: $creating-deck-height;
-    background-color: red;
+    background-color: rgb(var(--v-theme-tertiary));
+    
+    box-shadow: inset 0px 10px 15px -3px rgba(0,0,0,0.3);
     width:100%;
-}
-.creating-deck-container-spacer {
-    height: $creating-deck-height;
+    padding: 35px 0;
 }
 .card-slot {
     position: relative;
@@ -195,8 +239,42 @@ $creating-deck-height: 200px;
 .deck-actions {
     display: flex;
     flex-direction: column;
-    button {
-        margin: 10px;
+    width:$deck-actions-width;
+    align-items: center;
+    position: absolute;
+    right: -140px;
+    .deck-action-button {
+        cursor: pointer;
+        border: 2px solid white;
+        border-radius: 100px;
+        width: 55px;
+        height: 55px;
+        padding: 5px;
+        transition: .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        margin: 5px 0;
+        .button-icon{
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align:center;
+        }
+        &:hover{
+            width:$deck-actions-width;
+            background-color: white;
+            box-shadow: 0px 5px 5px rgba(0,0,0,0.2);
+            transition:.3s;
+        }
+        &:active{
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+            transition: .05s
+        }
+    }
+    .deck-action-button-disabled {
+        pointer-events: none;
+        user-select: none;
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+        opacity: 0.5;
     }
 }
 .card-remover {
@@ -226,5 +304,23 @@ $creating-deck-height: 200px;
     &:focus {
         outline: 3px solid rgb(var(--v-theme-primary));
     }
+}
+</style>
+
+<style lang="scss">
+.builder-container {
+    .v-expansion-panel__shadow {
+        box-shadow: none;
+        outline: 1px solid white;
+    }
+    .v-expansion-panel-title__overlay {
+        opacity: 0 !important;
+        &:hover {
+            opacity: 0.1 !important;
+        }
+    }
+}
+.deck-actions .deck-action-button:hover .v-icon {
+    color: rgb(var(--v-theme-black)) !important;
 }
 </style>

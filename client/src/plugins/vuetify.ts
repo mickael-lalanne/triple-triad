@@ -33,8 +33,6 @@ export default createVuetify({
                     primary: '#2CD3E1',
                     secondary: '#F266AB',
                     tertiary: '#FFB84C',
-                    player1Color: '#2CD3E1',
-                    player2Color: '#F266AB',
                     black: '#222831'
                 }
             }

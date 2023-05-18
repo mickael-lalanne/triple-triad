@@ -1,23 +1,14 @@
 <template>
-    <main>
-        <div class="deck-view-container">
-            <!-- DECK VIEWER -->
-            <DeckViewer
-                class="deck-viewer"
-                :userDecks="userDecks"
-                @[ETripleTriadEvent.EditDeck]="editDeck"
-                @[ETripleTriadEvent.DeleteDeck]="deleteDeck"
-            />
-            <!-- ADD DECK BUTTON -->
-            <div class="add-deck-container d-flex align-center justify-center" @click="showDeckBuilder = true">
-                <v-icon
-                    class="remove-icon"
-                    :size="50"
-                    icon="mdi-plus-circle-outline"
-                    color="white"
-                ></v-icon>
-            </div>
-        </div>
+    <div class="deck-view-container">
+        <HomeButton />
+        <!-- DECK VIEWER -->
+        <DeckViewer
+            class="deck-viewer"
+            :userDecks="userDecks"
+            @[ETripleTriadEvent.EditDeck]="editDeck"
+            @[ETripleTriadEvent.DeleteDeck]="deleteDeck"
+            @[ETripleTriadEvent.AddDeck]="showDeckBuilder = true"
+        />
         <!-- DECK BUILDER -->
         <v-dialog
             v-model="showDeckBuilder"
@@ -25,8 +16,8 @@
             :scrim="false"
             transition="dialog-bottom-transition"
         >
-        <v-card>
-                <v-toolbar dark color="primary">
+            <v-card class="bg-black">
+                <v-toolbar dark color="tertiary">
                     <v-toolbar-title class="builder-title">
                         {{ $vuetify.locale.t('$vuetify.deck.createTitle') }}
                     </v-toolbar-title>
@@ -39,7 +30,7 @@
                 />
             </v-card>
         </v-dialog>
-    </main>
+    </div>
 </template>
 
 <script lang="ts">
@@ -48,6 +39,7 @@ import DeckBuilder from '@/components/DeckBuilder.vue';
 import { ETripleTriadEvent } from '@/models/Event';
 import type { Deck } from '@/models/Deck';
 import { DeckService } from '@/services/deckService';
+import HomeButton from '@/components/HomeButton.vue';
 
 const tmpDecks: Deck[] = [
     {
@@ -86,7 +78,7 @@ export default {
             deckToEdit: undefined as undefined | Deck
         };
     },
-    components: { DeckViewer, DeckBuilder },
+    components: { DeckViewer, DeckBuilder, HomeButton },
     methods: {
         /**
          * Called when a deck has been created or edited from the Deck Builder
@@ -131,28 +123,26 @@ export default {
 
 <style scoped lang="scss">
 .deck-view-container {
+    height: 100vh;
+    overflow: hidden;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
 }
 .deck-viewer {
     flex-grow: 1;
 }
-.add-deck-container {
-    cursor: pointer;
-    background-color: grey;
-    color: white;
-    width: 50px;
-    height: 100vh;
-    transition: all .2s ease-in-out;
-    &:hover {
-
-       width: 75px;
-    }
-}
 .builder-title {
     text-align: center;
     margin: 0;
-    text-decoration: underline;
+    text-transform: uppercase;
+    font-size: 28px;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+    font-weight: 500;
+}
+</style>
+<style lang="scss">
+.builder-title .v-toolbar-title__placeholder {
+    font-weight: 400;
 }
 </style>
