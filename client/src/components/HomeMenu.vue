@@ -5,7 +5,7 @@
                 {{ $vuetify.locale.t('$vuetify.home.menu.logout') }}
             </a>
         </div>
-        <div class="d-flex align-center justify-center">
+        <div class="d-flex align-center justify-center" style="width: 100%;">
             <!-- PLAY -->
             <RouterLink class="card-container card-board" to="/board">
                 <div class="card-bg"></div>
@@ -60,11 +60,18 @@ export default {
 
 <style scoped lang="scss">
 $card-border-radius: 20px;
+.home-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
 .home-header {
     color: white;
-    display: flex;
-    justify-content: end;
-    padding-top: 25px;
+    top: 25px;
+    right: 25px;
+    position: absolute;
     .logout {
         cursor: pointer;
         font-family: 'Roboto', sans-serif;
@@ -171,7 +178,7 @@ $card-border-radius: 20px;
         border-radius: 75%;
     }
     .card-title {
-        font-family: 'Carbon', sans-serif;
+        font-family: 'ProximaNova', sans-serif;
         color: white;
         font-size: 50px;
         font-weight: 400;

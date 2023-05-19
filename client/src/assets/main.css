@@ -2,8 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
 
 @font-face {
-    font-family: "Carbon";
-    src: url('./fonts/carbon bl.otf');
+    font-family: "ProximaNova";
+    src: url('./fonts/proximanova-black.otf');
 }
 
 #app {

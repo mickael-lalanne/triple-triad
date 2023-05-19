@@ -3,12 +3,15 @@ import { en } from 'vuetify/locale';
 export default {
     ...en,
     home: {
-        title: 'Triple Triad',
         menu: {
             play: 'Play',
             deckManagement: 'Deck Creation',
             logout: 'Logout',
         }
+    },
+    login: {
+        title: 'Triple Triad',
+        subtitle: 'By Mickaël Lalanne'
     },
     board: {
         playersTurn: 'Player\'s {0} turn',
