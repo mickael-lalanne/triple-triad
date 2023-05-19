@@ -25,7 +25,9 @@ export default {
         createTitle: 'Deck Creation',
         defaultDeckName: 'Deck n°{0}',
         createDeck: 'Create deck',
-        updateDeck: 'Update deck'
+        updateDeck: 'Update deck',
+        noDeckMessageTop: `You haven't made any decks yet.`,
+        noDeckMessageBot: 'Click on the button bellow!'
     },
     shared: {
         cancel: 'Cancel'

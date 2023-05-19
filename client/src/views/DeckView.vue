@@ -3,7 +3,6 @@
         <HomeButton />
         <!-- DECK VIEWER -->
         <DeckViewer
-            class="deck-viewer"
             :userDecks="userDecks"
             @[ETripleTriadEvent.EditDeck]="editDeck"
             @[ETripleTriadEvent.DeleteDeck]="deleteDeck"
@@ -127,9 +126,6 @@ export default {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-}
-.deck-viewer {
-    flex-grow: 1;
 }
 .builder-title {
     text-align: center;
