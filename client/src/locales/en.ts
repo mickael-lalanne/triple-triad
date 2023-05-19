@@ -5,8 +5,14 @@ export default {
     home: {
         menu: {
             play: 'Play',
-            deckManagement: 'Deck Creation',
+            deckManagement: 'My Decks',
             logout: 'Logout',
+        },
+        modeSelector: {
+            title: 'Choose a mode',
+            local: 'Local',
+            ai: 'Versus AI',
+            online: 'Online'
         }
     },
     login: {
@@ -30,6 +36,7 @@ export default {
         noDeckMessageBot: 'Click on the button bellow!'
     },
     shared: {
-        cancel: 'Cancel'
+        cancel: 'Cancel',
+        later: 'Coming later'
     }
 }

@@ -6,9 +6,15 @@
             </a>
         </div>
         <div class="d-flex align-center justify-center" style="width: 100%;">
-            <!-- PLAY -->
-            <RouterLink class="card-container card-board" to="/board">
-                <div class="card-bg"></div>
+            <!-- PLAY BUTTON-->
+            <div
+                class="card-container card-board"
+                @click="onPlayButtonClicked"
+                :class="{ 'card-board-selected': showSelectorMode }"
+            >
+                <div class="card-bg-container">
+                    <div class="card-bg"></div>
+                </div>
                 <div class="card-header"></div>
                 <div class="card-icon-container">
                     <div class="card-icon">
@@ -22,11 +28,25 @@
                 <div class="card-content">
                     <div class="card-title">{{ $vuetify.locale.t('$vuetify.home.menu.play') }}</div>
                 </div>
-            </RouterLink>
+                <!-- GAME MODE SELECTOR -->
+                <GameModeSelector
+                    class="game-mode-selector"
+                    :class="{ 'game-mode-selector-hidden': !showSelectorMode }"
+                    :show="showSelectorMode"
+                    @[ETripleTriadEvent.CloseModeSelector]="closeGameModeSelector"
+                    @[ETripleTriadEvent.SelectLocalMode]="onGameModeSelected"
+                />
+            </div>
 
-            <!-- DECK MANAGEMENT -->
-            <RouterLink class="card-container card-deck" to="/decks">
-                <div class="card-bg"></div>
+            <!-- DECK BUTTON -->
+            <RouterLink
+                class="card-container card-deck"
+                to="/decks"
+                :class="{ 'card-deck-hidden': showSelectorMode, 'card-deck-in-animation': closingSelectorMode }"
+            >
+                <div class="card-bg-container">
+                    <div class="card-bg"></div>
+                </div>
                 <div class="card-header"></div>
                 <div class="card-icon-container">
                     <div class="card-icon">
@@ -47,12 +67,57 @@
 
 </template><script lang="ts">
 import { Auth } from '@aws-amplify/auth';
+import GameModeSelector from '@/components/GameModeSelector.vue';
+import { ETripleTriadEvent } from '@/models/Event';
+import { EGameMode } from '@/models/GameMode';
+import router from '@/router';
 
 export default {
+    components: { GameModeSelector },
+    data() {
+        return {
+            ETripleTriadEvent: ETripleTriadEvent,
+            showSelectorMode: false as boolean,
+            closingSelectorMode: false as boolean
+        };
+    },
     methods: {
         async logout(): Promise<void> {
             await Auth.signOut();
             this.$router.push({ path: '/login'});
+        },
+        onPlayButtonClicked(clickEvent: MouseEvent): void {
+            // Check that click is not emited from game mode header
+            // Otherwise, mode selector panel won't close
+            const gameModeHeader: Element = document.getElementsByClassName('mode-selector-header')[0];
+            this.showSelectorMode = !gameModeHeader.contains(clickEvent.target as Node);
+        },
+        /**
+         * Called when a game mode has been selected
+         * @param {EGameMode} gameMode can be local, ai or online
+         */
+        onGameModeSelected(gameMode: EGameMode): void {
+            switch (gameMode) {
+                case EGameMode.local:
+                    router.push({ path: '/board' });
+                    break;
+            
+                case EGameMode.ai:
+                    // TODO
+                    break;
+
+                case EGameMode.online:
+                    // TODO
+                    break;
+            }
+        },
+        closeGameModeSelector(): void {
+            this.showSelectorMode = false;
+            // Set closingSelectorMode data, it adds a class to the deck button just the time of the closing animation
+            this.closingSelectorMode = true;
+            setTimeout(() => {
+                this.closingSelectorMode = false;
+            }, 2000);
         }
     }
 }
@@ -60,6 +125,8 @@ export default {
 
 <style scoped lang="scss">
 $card-border-radius: 20px;
+$gamemode-transition-delay: .5s;
+$gamemode-transition: all .8s ease-in-out;
 .home-container {
     height: 100vh;
     display: flex;
@@ -91,9 +158,12 @@ $card-border-radius: 20px;
     flex-direction: column;
     border-radius: $card-border-radius;
     transition: all .3s ease-in-out;
-    overflow: hidden;
+    overflow: visible;
     padding: 0 50px;
+    cursor: pointer;
+    &.card-board-selected,
     &:hover {
+        transition-delay: 0s;
         transform: scale(1.1);
 
         .card-header img {
@@ -164,6 +234,15 @@ $card-border-radius: 20px;
         display: flex;
         justify-content: center;
     }
+    .card-bg-container {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        border-radius: $card-border-radius;
+    }
     .card-bg {
         height: 128px;
         width: 128px;
@@ -202,6 +281,7 @@ $card-border-radius: 20px;
 .card-board {
     // Gradient generated with https://mycolor.space/
     background-image: linear-gradient(to right top, #222831, #324d60, #377690, #32a3bc, #2cd3e1);
+    &.card-board-selected,
     &:hover {
         // Glow effect
         -webkit-box-shadow:0px 0px 91px 0px rgb(var(--v-theme-primary));
@@ -210,6 +290,7 @@ $card-border-radius: 20px;
     }
 }
 .card-deck {
+    transition-delay: 0s;
     // Gradient generated with https://mycolor.space/
     background-image: linear-gradient(to right top, #222831, #3b3f5f, #6b5287, #ac5ea2, #f266ab);
     &:hover {
@@ -218,6 +299,25 @@ $card-border-radius: 20px;
         -moz-box-shadow: 0px 0px 91px 0px rgb(var(--v-theme-secondary));
         box-shadow: 0px 0px 91px 0px rgb(var(--v-theme-secondary));
     }
+}
+.card-deck-in-animation {
+    pointer-events: none;
+    user-select: none;
+    transition: $gamemode-transition;
+    transition-delay: $gamemode-transition-delay !important;
+}
+.card-deck-hidden {
+    transition: $gamemode-transition;
+    opacity: 0;
+    transform: scale(0);
+}
+
+.game-mode-selector {
+    transition: $gamemode-transition;
+    transition-delay: $gamemode-transition-delay;
+}
+.game-mode-selector-hidden {
+    transition-delay: 0s;
 }
 
 // ROTATE ANIMATION
@@ -249,5 +349,4 @@ $card-border-radius: 20px;
         transform: rotate(360deg);
     }
 }
-
 </style>

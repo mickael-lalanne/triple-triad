@@ -42,7 +42,6 @@ export default {
             // After a delay, if the home button is still pressed, redirect to the home page
             setTimeout(() => {
                 if (this.isMouseDown) {
-                    console.log('redirect...');
                     router.push({ path: '/' });
                 }
             }, 1200);
