@@ -5,6 +5,7 @@
 
 <script setup lang="ts">
 import router from '@/router';
+import { AuthenticatorService } from '@/services/authenticatorService';
 import type { HubCapsule } from '@aws-amplify/core';
 import { Authenticator } from '@aws-amplify/ui-vue';
 import '@aws-amplify/ui-vue/styles.css';
@@ -14,6 +15,7 @@ Hub.listen('auth', (data: HubCapsule) => {
     switch (data.payload.event) {
         // Listen for sign in event to redirect to the main menu
         case 'signIn':
+            AuthenticatorService.USER_ID = data.payload.data.attributes.sub;
             router.push({ path: '/' });
             break;
         default:

@@ -23,7 +23,7 @@
                 <div class="deck-name">{{ deck.name }}</div>
                 <!-- Deck cards -->
                 <div class="deck-cards-container d-flex align-center">
-                    <img v-for="card in deck.cards" :key="card.id" :src="'/images/cards/' + card.source"/>
+                    <img v-for="card in getDeckCards(deck.cards)" :key="card.id" :src="'/images/cards/' + card.source"/>
                 </div>
                 <!-- Action buttons -->
                 <div v-if="/*deckHover === deck.id*/true" class="deck-action-buttons d-flex" :class="{ 'deck-action-buttons-visible': deckHover === deck.id }">
@@ -33,7 +33,7 @@
                         <v-icon :size="30" icon="mdi-pencil-outline" color="white"></v-icon>
                     </div>
                     <!-- Delete deck -->
-                    <div class="action-icon" @click="$emit(ETripleTriadEvent.DeleteDeck, deck)">
+                    <div class="action-icon" @click="$emit(ETripleTriadEvent.DeleteDeck, deck.id)">
                         <v-icon :size="30" icon="mdi-delete-outline" color="white"></v-icon>
                     </div>
                 </div>
@@ -55,8 +55,10 @@
 </template>
 
 <script lang="ts">
+import type { Card } from '@/models/Card';
 import type { Deck } from '@/models/Deck';
 import { ETripleTriadEvent } from '@/models/Event';
+import { DeckService } from '@/services/deckService';
 import type { PropType } from 'vue';
 
 export default {
@@ -70,6 +72,9 @@ export default {
         };
     },
     methods: {
+        getDeckCards(cardsIds: number[]): Card[] {
+            return DeckService.resolveDeckCards(cardsIds);
+        }
     }
 };
 </script>

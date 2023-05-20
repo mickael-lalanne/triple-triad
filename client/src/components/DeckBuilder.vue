@@ -91,6 +91,7 @@
 import { FIVE_STAR_CARDS, FOUR_STAR_CARDS, ONE_STAR_CARDS, THREE_STAR_CARDS, TWO_STAR_CARDS, type Card } from '@/models/Card';
 import type { Deck } from '@/models/Deck';
 import { ETripleTriadEvent } from '@/models/Event';
+import { DeckService } from '@/services/deckService';
 import type { PropType } from 'vue';
 
 export default {
@@ -116,7 +117,7 @@ export default {
     beforeMount() {
         // Check if we have to edit a deck
         if (this.deckToEdit) {
-            this.selectedCards = this.deckToEdit.cards;
+            this.selectedCards = DeckService.resolveDeckCards(this.deckToEdit.cards);
             this.deckName = this.deckToEdit.name;
         }
     },
@@ -142,10 +143,10 @@ export default {
          * Called when create button has been clicked
          * Emit an event to the parent to create the deck
          */
-        createDeck() {
+        async createDeck() {
             const deckToCreate: Partial<Deck> = {
                 name: this.deckName === '' ? this.$vuetify.locale.t('$vuetify.deck.defaultDeckName', this.deckLength + 1) : this.deckName,
-                cards: this.selectedCards,
+                cards: this.selectedCards.map(card => card.id),
                 id: this.editing ? this.deckToEdit?.id : undefined
             };
             this.$emit(ETripleTriadEvent.CreateDeck, deckToCreate, this.editing)

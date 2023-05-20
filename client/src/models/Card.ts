@@ -693,3 +693,5 @@ export const FIVE_STAR_CARDS: Card[] = [
         stars: 5
     },
 ];
+
+export const ALL_CARDS: Card[] = [...ONE_STAR_CARDS, ...TWO_STAR_CARDS, ...THREE_STAR_CARDS, ...FOUR_STAR_CARDS, ...FIVE_STAR_CARDS];
