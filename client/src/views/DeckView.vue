@@ -49,9 +49,6 @@ export default {
             deckToEdit: undefined as undefined | Deck
         };
     },
-    async beforeCreate() {
-        this.userDecks = await DeckService.getUserDecks();
-    },
     components: { DeckViewer, DeckBuilder, HomeButton },
     methods: {
         /**

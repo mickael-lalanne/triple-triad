@@ -1,10 +1,15 @@
 <script lang="ts">
 import { RouterView } from 'vue-router';
-import { AuthenticatorService } from './services/authenticatorService';
+import { AuthenticatorService } from '@/services/authenticatorService';
+import { DeckService } from '@/services/deckService';
+import { useDeckStore } from "@/stores/deck.store";
+
 export default {
     components: { RouterView },
-    beforeMount() {
-        AuthenticatorService.init();
+    async beforeMount() {
+        await AuthenticatorService.init();
+        DeckService.deckStore = useDeckStore() as any;
+        DeckService.getUserDecks();
     }
 }
 </script>

@@ -6,8 +6,11 @@ import { type GraphQLQuery } from '@aws-amplify/api';
 import * as mutations from '@/graphql/mutations';
 import * as queries from '@/graphql/queries';
 import { AuthenticatorService } from "./authenticatorService";
+import { type DeckStore } from "@/stores/deck.store";
 
 export class DeckService {
+    public static deckStore: DeckStore;
+
     /**
      * A deck consists of one 1 star, one 2 stars, one 3 stars, one 4 stars and one 5 stars card
      * @returns {Card[]} a random deck}
@@ -45,12 +48,15 @@ export class DeckService {
             userId: AuthenticatorService.USER_ID
         };
 
-        const deckCreated = await API.graphql<GraphQLQuery<CreateDeckMutation>>({ 
+        const deckCreated: Deck = await API.graphql<GraphQLQuery<CreateDeckMutation>>({ 
             query: mutations.createDeck, 
             variables: { input: deckToCreate }
-        });
+        }) as Deck;
 
-        return deckCreated as Deck;
+        // Add created deck in store
+        this.deckStore.addDeck(deckCreated);
+
+        return deckCreated;
     }
 
     /**
@@ -62,6 +68,9 @@ export class DeckService {
             query: mutations.deleteDeck, 
             variables: { input: { id: deckId } }
         });
+
+        // Delete deck in store
+        this.deckStore.deleteDeck(deckId);
     }
 
     /**
@@ -74,7 +83,13 @@ export class DeckService {
             query: mutations.updateDeck, 
             variables: { input: deckToEdit }
         });
-        return apiResponse.data?.updateDeck as Deck;
+
+        const updateDeck: Deck = apiResponse.data?.updateDeck as Deck;
+
+        // Save updated deck in store
+        this.deckStore.updateDeck(updateDeck);
+
+        return updateDeck;
     }
 
     /**
@@ -91,8 +106,14 @@ export class DeckService {
                 }
             }
         });
-        return apiResponse && apiResponse.data && apiResponse.data.listDecks && apiResponse.data.listDecks.items
+
+        const userDekcs: Deck[] = apiResponse && apiResponse.data && apiResponse.data.listDecks && apiResponse.data.listDecks.items
             ? apiResponse.data.listDecks.items as unknown as Deck[]
             : [];
+        
+        // Save decks in store
+        this.deckStore.initDecks(userDekcs);
+
+        return userDekcs;
     }
 }

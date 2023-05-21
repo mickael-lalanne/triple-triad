@@ -11,5 +11,6 @@ export enum ETripleTriadEvent {
      * MODE SELECTOR
      */
     CloseModeSelector = 'close-mode-selector',
-    SelectLocalMode = 'select-local-mode'
+    PlayLocalMode = 'play-local-mode',
+    CloseDeckSelector = 'close-deck-selector'
 }

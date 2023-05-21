@@ -13,6 +13,11 @@ export default {
             local: 'Local',
             ai: 'Versus AI',
             online: 'Online'
+        },
+        deckSelector: {
+            localTitle: 'Choose a deck for',
+            localTitleP1: 'Player 1',
+            localTitleP2: 'Player 2'
         }
     },
     login: {
@@ -37,6 +42,8 @@ export default {
     },
     shared: {
         cancel: 'Cancel',
-        later: 'Coming later'
+        later: 'Coming later',
+        next: 'Next',
+        play: 'Play'
     }
 }

@@ -68,7 +68,7 @@
                                 :size="25"
                                 icon="mdi-content-save"
                                 color="white"
-                        ></v-icon>
+                            ></v-icon>
                         </div>
                     </div>
                     <!-- Cancel button -->
@@ -78,7 +78,7 @@
                                 :size="25"
                                 icon="mdi-cancel"
                                 color="white"
-                        ></v-icon>
+                            ></v-icon>
                         </div>
                     </div>
                 </div>
