@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import LoginView from '../views/LoginView.vue';
-import BoardView from '../views/BoardView.vue';
 import DeckView from '../views/DeckView.vue';
 import { Auth } from '@aws-amplify/auth';
 
@@ -17,11 +16,6 @@ const router = createRouter({
             path: '/login',
             name: 'login',
             component: LoginView
-        },
-        {
-            path: '/board',
-            name: 'board',
-            component: BoardView
         },
         {
             path: '/decks',

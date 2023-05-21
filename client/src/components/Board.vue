@@ -52,7 +52,7 @@
 
             <!-- DECK -->
             <draggable
-                :list="playerTurn ? player2Deck : player1Deck"
+                :list="playerTurn ? player2Cards : player1Cards"
                 :group="{ name: 'card', pull: 'clone', put: false }"
                 @start="drag = true"
                 @end="drag = false"
@@ -117,6 +117,7 @@ import type { Card } from '@/models/Card';
 import { DeckService } from '@/services/deckService';
 import draggable from 'vuedraggable';
 import HomeButton, { HOME_HEADER_HEIGHT } from '@/components/HomeButton.vue';
+import type { PropType } from 'vue';
 
 interface BoardCell {
     card: Card;
@@ -124,13 +125,15 @@ interface BoardCell {
 }
 
 export default {
+    props: {
+        player1Cards: { type: Array as PropType<Card[]>, required: true },
+        player2Cards: { type: Array as PropType<Card[]>, required: true }
+    },
     data() {
         return {
             HOME_HEADER_HEIGHT: HOME_HEADER_HEIGHT,
             gameEnded: false as boolean,
             winner: 0 as null | 1 | 2,
-            player1Deck: [] as Card[],
-            player2Deck: [] as Card[],
             playerTurn: 0 as 0 | 1,
             drag: false as boolean,
             boardCards: [] as BoardCell[][],
@@ -138,11 +141,6 @@ export default {
         };
     },
     components: { draggable, HomeButton },
-    beforeMount() {
-        // Generate players deck
-        this.player1Deck = DeckService.generateRandomDeck();
-        this.player2Deck = DeckService.generateRandomDeck();
-    },
     methods: {
         /**
          * Called when a card has been played
@@ -153,7 +151,7 @@ export default {
          */
         onCardDropped(sortableEvent: any, line: number, cell: number): void {
             // First, place the card in the board
-            const deckPlayed: Card[] = this.playerTurn ? this.player2Deck : this.player1Deck; 
+            const deckPlayed: Card[] = this.playerTurn ? this.player2Cards : this.player1Cards; 
             const cardDropped: Card = deckPlayed[sortableEvent.oldIndex];
     
             if (!this.boardCards[line]) {
@@ -263,9 +261,6 @@ export default {
             this.boardCards = [];
             this.cardsPlayed = [[], []];
             this.playerTurn = 0;
-            // Regenerate players deck
-            this.player1Deck = DeckService.generateRandomDeck();
-            this.player2Deck = DeckService.generateRandomDeck();
         },
         /**
          * Get the card for a specific location
@@ -382,16 +377,6 @@ $footer-height: 200px;
     background-color: white;
     border-radius: 10px;
     font-size: 20px;
-}
-.replay-icon-container {
-    position: absolute;
-    right: 20px;
-    padding: 10px;
-    background-color: white;
-    border-radius: 50%;
-    cursor: pointer;
-}
-.replay-icon {
 }
 .deck-container {
     display: flex;

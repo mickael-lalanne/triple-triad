@@ -34,7 +34,7 @@
                     :class="{ 'game-mode-selector-hidden': !showSelectorMode }"
                     :show="showSelectorMode"
                     @[ETripleTriadEvent.CloseModeSelector]="closeGameModeSelector"
-                    @[ETripleTriadEvent.SelectLocalMode]="onGameModeSelected"
+                    @[ETripleTriadEvent.PlayLocalMode]="$emit(ETripleTriadEvent.PlayLocalMode, $event)"
                 />
             </div>
 
@@ -90,7 +90,7 @@ export default {
             // Check that click is not emited from game mode header
             // Otherwise, mode selector panel won't close
             const gameModeHeader: Element = document.getElementsByClassName('mode-selector-header')[0];
-            this.showSelectorMode = !gameModeHeader.contains(clickEvent.target as Node);
+            this.showSelectorMode = gameModeHeader && !gameModeHeader.contains(clickEvent.target as Node);
         },
         /**
          * Called when a game mode has been selected

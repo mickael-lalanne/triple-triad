@@ -54,6 +54,7 @@
             v-if="showDeckSelector"
             :game-mode="gameMode"
             @[ETripleTriadEvent.CloseDeckSelector]="closeDeckSelector"
+            @[ETripleTriadEvent.PlayLocalMode]="$emit(ETripleTriadEvent.PlayLocalMode, $event)"
         />
     </div>
 </template>
