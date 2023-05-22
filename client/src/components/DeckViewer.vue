@@ -1,9 +1,22 @@
 <template>
-    <div class="deck-viewer-container">
-        <div class="viewer-title">My decks</div>
+    <div
+        class="deck-viewer-container"
+        :class="{
+            'deck-viewer-container-hidden': !show,
+            'deck-viewer-container-visible': show,
+        }"
+    >
+        <div class="viewer-header" @click="$emit(ETripleTriadEvent.CloseDeckViewer)">
+            <v-icon
+                class="mode-selector-close-icon"
+                :size="25"
+                icon="mdi-chevron-right"
+                color="white"
+            ></v-icon>
+        </div>
         <div class="viewer-container">
             <!-- No deck message -->
-            <div v-if="userDecks.length === 0" class="deck-container no-deck-container">
+            <div v-if="getUserDecks.length === 0" class="deck-container no-deck-container">
                 <div class="no-deck-content d-flex align-center justify-center">
                     {{ $vuetify.locale.t('$vuetify.deck.noDeckMessageTop') }} <br>
                     {{ $vuetify.locale.t('$vuetify.deck.noDeckMessageBot') }}
@@ -13,106 +26,136 @@
                 </div>
             </div>
             <div
-                v-for="deck in userDecks"
+                v-for="deck in getUserDecks"
                 :key="deck.id"
                 class="deck-container d-flex align-stretch"
                 @mouseenter="deckHover = deck.id"
-                @mouseleave="deckHover = null"
+                @mouseleave="deckHover = undefined"
             >
-                <!-- Deck name -->
-                <div class="deck-name">{{ deck.name }}</div>
                 <!-- Deck cards -->
                 <div class="deck-cards-container d-flex align-center">
                     <img v-for="card in getDeckCards(deck.cards)" :key="card.id" :src="'/images/cards/' + card.source"/>
-                </div>
                 <!-- Action buttons -->
-                <div v-if="/*deckHover === deck.id*/true" class="deck-action-buttons d-flex" :class="{ 'deck-action-buttons-visible': deckHover === deck.id }">
+                <div
+                    class="deck-action-buttons d-flex"
+                    :class="{ 'deck-action-buttons-visible': deckHover === deck.id && !showDeleteConfirmation }"
+                >
                     <div class="actions-layer"></div>
-                    <!-- Edit action -->
-                    <div class="action-icon" @click="$emit(ETripleTriadEvent.EditDeck, deck)">
-                        <v-icon :size="30" icon="mdi-pencil-outline" color="white"></v-icon>
+                    <div class="action-button" @click="$emit(ETripleTriadEvent.EditDeck, deck)">
+                        {{ $vuetify.locale.t('$vuetify.shared.edit') }}
                     </div>
-                    <!-- Delete deck -->
-                    <div class="action-icon" @click="$emit(ETripleTriadEvent.DeleteDeck, deck.id)">
-                        <v-icon :size="30" icon="mdi-delete-outline" color="white"></v-icon>
+                    <div class="action-button" @click="showDeleteConfirmation = deck.id">
+                        {{ $vuetify.locale.t('$vuetify.shared.delete') }}
                     </div>
+                </div>
+                </div>
+                <!-- Deck name -->
+                <div class="deck-name">{{ deck.name }}</div>
+                <!-- Delete confirmation -->
+                <div v-if="showDeleteConfirmation === deck.id" class="delete-confirmation">
+                    <div class="d-flex">
+                        {{ $vuetify.locale.t('$vuetify.home.deckViewer.deleteDeck') }}
+                        <span class="delete-deck-name">"{{ deck.name }}""</span> ?
+                    </div>
+                    <div class="delete-confirm-buttons">
+                        <div class="delete" @click="confirmDelete(deck.id!)">
+                            {{ $vuetify.locale.t('$vuetify.shared.delete') }}
+                        </div>
+                        <div class="cancel" @click="showDeleteConfirmation = undefined">
+                            {{ $vuetify.locale.t('$vuetify.shared.cancel') }}
+                        </div>
+                    </div>
+                    <!-- Loading indicator -->
+                    <v-progress-linear
+                        v-if="deletionConfirmed"
+                        class="delete-loading"
+                        color="secondary"
+                        indeterminate
+                    ></v-progress-linear>
                 </div>
             </div>
         </div>
-        
+        <v-spacer></v-spacer>
         <!-- ADD DECK BUTTON -->
-        <div class="add-deck-container" @click="$emit(ETripleTriadEvent.AddDeck)">
-            <div class="add-deck-button d-flex align-center justify-center">
-                <v-icon
-                    class="add-deck-icon"
-                    :size="50"
-                    icon="mdi-plus-circle-outline"
-                    color="white"
-                ></v-icon>
-            </div>
+        <div class="add-deck-button" @click="$emit(ETripleTriadEvent.AddDeck)">
+            {{ $vuetify.locale.t('$vuetify.home.deckViewer.addDeck') }}
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import type { Card } from '@/models/Card';
-import type { Deck } from '@/models/Deck';
 import { ETripleTriadEvent } from '@/models/Event';
 import { DeckService } from '@/services/deckService';
-import type { PropType } from 'vue';
+import { useDeckStore } from '@/stores/deck.store';
+import { mapState } from 'pinia';
 
 export default {
     props: {
-        userDecks: { type: Array as PropType<Deck[]>, default: () => [] }
+        show: { type: Boolean, default: () => false }
     },
     data() {
         return {
             ETripleTriadEvent: ETripleTriadEvent,
-            deckHover: null as null | number
+            deckHover: undefined as undefined | string,
+            showDeleteConfirmation: undefined as string | undefined,
+            deletionConfirmed: false as boolean
         };
+    },
+    computed: {
+        ...mapState(useDeckStore, ['getUserDecks'])
     },
     methods: {
         getDeckCards(cardsIds: number[]): Card[] {
             return DeckService.resolveDeckCards(cardsIds);
+        },
+        async confirmDelete(deckId: string): Promise<void> {
+            this.deletionConfirmed = true; // Show loading indicator
+            await DeckService.deleteDeck(deckId);
+        },
+        /**
+         * Called when the delete icon of a deck has been clicked
+         * Delete deck client side and server side
+         * @param {Deck} deckId id of the deck to delete
+         */
+        async deleteDeck(deckId: string) {
+            await DeckService.deleteDeck(deckId);
+            this.showDeleteConfirmation = undefined;
+            this.deletionConfirmed = false;
         }
     }
 };
 </script>
 
 <style scoped lang="scss">
-$deck-radius: 25px;
-$viewer-width: 85vw;
-$add-button-height: 75px;
-$add-button-hover-height: 125px;
-$deck-width: 520px;
-
 .deck-viewer-container {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: fit-content;
-    margin: auto;
-    margin-top: 20px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    margin-bottom: 50px;
+    padding: 20px;
+    border-radius: 20px;
+    cursor: default;
+    border-left: 3px solid rgb(var(--v-theme-secondary));
 }
 
-.viewer-title {
-    text-align: center;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 400;
-    color: white;
-    font-size: 28px;
-    text-transform: uppercase;
-    margin-bottom: 30px;
+.deck-viewer-container-hidden {
+    opacity: 0;
+}
+.deck-viewer-container-visible {
+    opacity: 1;
+    transform: translateX(-100%);
+}
+.viewer-header {
+    cursor: pointer;
+    margin-bottom: 10px;
 }
 .viewer-container {
+    min-height: 0;
     overflow: auto;
-    width: fit-content;
-    padding-right: 60px;
-    margin-bottom: $add-button-height;
 }
 ::-webkit-scrollbar {
     width: 5px;
@@ -126,14 +169,15 @@ $deck-width: 520px;
     border-radius: 10px;
 }
 .deck-container {
-    background-color: rgb(var(--v-theme-primary));
     position: relative;
-    margin: 25px;
-    width: $deck-width;
-    height: 150px;
-    padding: 0 10px;
-    border-radius: $deck-radius;
+    margin-bottom: 25px;
+    border: 1px solid white;
     text-align: center;
+    flex-direction: column;
+    overflow: hidden;
+    &:last-child {
+        margin-bottom: 0;
+    }
 }
 .no-deck-container {
     position: relative;
@@ -162,37 +206,40 @@ $deck-width: 520px;
 }
 .deck-cards-container {
     z-index: 1;
+    min-width: 0;
+    position: relative;
+    img {
+        min-width: 0;
+    }
 }
 .deck-name {
-    position: absolute;
     background-color: rgb(var(--v-theme-secondary));
-    bottom: 0;
-    left: 0;
-    padding: 15px;
-    border-bottom-left-radius: $deck-radius;
-    border-top-right-radius: $deck-radius;
-    max-width: 33%;
+    padding: 5px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     z-index: 2;
     color: white;
+    width: -webkit-fill-available;
+    font-size: 14px;
+    border-top: 1px solid white;
 }
+$actions-buttons-height: 30px;
 .deck-action-buttons {
     position: absolute;
-    right: 0;
-    flex-direction: column;
-    height: 100%;
-    padding: 0 7px;
-    justify-content: space-evenly;
-    opacity: 1;
+    bottom: calc(0px - #{$actions-buttons-height});
+    align-items: center;
+    height: $actions-buttons-height;
+    justify-content: center;
     -webkit-transition: all .5s ease;
     -o-transition: all .5s ease;
     transition: all .5s ease;
+    z-index: 1;
+    left: 0;
+    width: 100%;
 }
 .deck-action-buttons-visible {
-    opacity: 1;
-    transform: translateX(60px);
+    bottom: 0;
 }
 .actions-layer {
     position: absolute;
@@ -200,86 +247,88 @@ $deck-width: 520px;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgb(var(--v-theme-primary));
-    border-top-right-radius: $deck-radius;
-    border-bottom-right-radius: $deck-radius;
+    background-color: rgba(var(--v-theme-black), 0.7);
 }
-.action-icon {
-    z-index: 0;
-    cursor: pointer;
-}
-
-.action-icon{
-    $icon-size	  : 50px;
-    $border-radius: 0.5;//15% = 0.15, 50% = 0.50 etc.
-    $background   : #2d2c3e;
-    $background-b : #2d2c3e;
-	cursor: pointer;
-	position: relative;
-	display: flex;
+.action-button {
+    color: white;
+    z-index: 1;
+    flex: 1;
+    border-top: 1px solid white;
+    border-bottom: 0;
+    height: 100%;
+    display: flex;
     align-items: center;
     justify-content: center;
-	width: $icon-size;
-	height: $icon-size;
-	margin-left: calc($icon-size / 5);
-	margin-right: calc($icon-size / 5);
-	border-radius: calc($icon-size * $border-radius);
-    $icon-hover-color: rgb(var(--v-theme-secondary));
-	overflow: hidden;
-	&::before,
-    &::after {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 100%;
-		width: 100%;
-		transition: all 0.25s ease;
-		border-radius: $icon-size * $border-radius;
-	}
-	&::after {
-		box-shadow: inset 0 0 0 2px $icon-hover-color;
-	}
-	&::before {
-		background: $icon-hover-color;
-		box-shadow: inset 0 0 0 $icon-size $background;
-	}
-	&:hover::before {
-		box-shadow: inset 0 0 0 2px $background;
-	}
-}
-
-.add-deck-container {
-    min-height: $add-button-hover-height;
-    width: $deck-width;
-    display: flex;
-    align-items: end;
-    margin-top: calc(0px - #{$add-button-hover-height});
-    // margin-right: 65px;
-    align-self: flex-start;
-    margin-left: 25px;
-}
-.add-deck-button {
-    box-shadow: inset 0px 10px 15px -3px rgba(0,0,0,0.3);
     cursor: pointer;
-    background-color: rgb(var(--v-theme-tertiary));
-    color: white;
-    height: $add-button-height;
-    width: 100%;
-    transition: all .2s ease-in-out;
-    z-index: 2;
-    .add-deck-icon {
-        transition: all .2s ease-in-out;
+    text-transform: uppercase;
+    &:last-child {
+        border-left: 1px solid white;
     }
     &:hover {
-        height: $add-button-hover-height;
-        // Glow effect
-        -webkit-box-shadow:0px 0px 25px 0px rgb(var(--v-theme-tertiary));
-        -moz-box-shadow: 0px 0px 25px 0px rgb(var(--v-theme-tertiary));
-        box-shadow: 0px 0px 25px 0px rgb(var(--v-theme-tertiary));
-        .add-deck-icon {
-            transform: scale(1.5);
+        background-color: rgba(var(--v-theme-secondary), 0.3);
+    }
+}
+.add-deck-button {
+    cursor: pointer;
+    color: white;
+    width: 100%;
+    border: 1px solid white;
+    text-align: center;
+    padding: 30px;
+    margin-top: 20px;
+    font-size: 20px;
+    text-transform: uppercase;
+    &:hover {
+        background-color: rgb(var(--v-theme-secondary));
+    }
+}
+.delete-confirmation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgb(var(--v-theme-black));
+    z-index: 2;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .delete-deck-name {
+        font-style: italic;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 185px;
+        white-space: pre;
+    }
+    .delete-confirm-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        div {
+            padding: 7px 20px;
+            margin: 10px 15px;
+            border: 1px solid white;
+            cursor: pointer;
         }
+    }
+    .delete:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    .cancel {
+        background-color: rgba(var(--v-theme-secondary), 0.5);
+        &:hover {
+            background-color: rgb(var(--v-theme-secondary));
+        }
+    }
+    .delete-loading {
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+        top: unset !important;
     }
 }
 </style>

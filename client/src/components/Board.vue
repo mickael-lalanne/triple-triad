@@ -1,6 +1,6 @@
 <template>
     <main class="board-view-container">
-        <HomeButton />
+        <HomeButton @[ETripleTriadEvent.BackHome]="$emit(ETripleTriadEvent.BackHome)"/>
         <!-- BOARD -->
         <div class="board-container" :style="`margin-top: -${HOME_HEADER_HEIGHT}px`">
             <div v-for="line in 3" :key="line" class="board-line d-flex justify-center">
@@ -114,10 +114,10 @@
 
 <script lang="ts">
 import type { Card } from '@/models/Card';
-import { DeckService } from '@/services/deckService';
 import draggable from 'vuedraggable';
 import HomeButton, { HOME_HEADER_HEIGHT } from '@/components/HomeButton.vue';
 import type { PropType } from 'vue';
+import { ETripleTriadEvent } from '@/models/Event';
 
 interface BoardCell {
     card: Card;
@@ -131,6 +131,7 @@ export default {
     },
     data() {
         return {
+            ETripleTriadEvent: ETripleTriadEvent,
             HOME_HEADER_HEIGHT: HOME_HEADER_HEIGHT,
             gameEnded: false as boolean,
             winner: 0 as null | 1 | 2,

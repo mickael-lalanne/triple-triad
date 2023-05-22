@@ -10,7 +10,11 @@
             <div
                 class="card-container card-board"
                 @click="onPlayButtonClicked"
-                :class="{ 'card-board-selected': showSelectorMode }"
+                :class="{
+                    'card-board-selected': showSelectorMode,
+                    'card-board-in-animation': closingDeckViewer,
+                    'card-container-hidden': showDeckViewer
+                }"
             >
                 <div class="card-bg-container">
                     <div class="card-bg"></div>
@@ -39,10 +43,15 @@
             </div>
 
             <!-- DECK BUTTON -->
-            <RouterLink
+            <div
                 class="card-container card-deck"
                 to="/decks"
-                :class="{ 'card-deck-hidden': showSelectorMode, 'card-deck-in-animation': closingSelectorMode }"
+                :class="{
+                    'card-container-hidden': showSelectorMode,
+                    'card-deck-in-animation': closingSelectorMode,
+                    'card-deck-selected': showDeckViewer,
+                }"
+                @click="onDeckButtonClicked"
             >
                 <div class="card-bg-container">
                     <div class="card-bg"></div>
@@ -61,24 +70,60 @@
                 <div class="card-content">
                     <div class="card-title">{{ $vuetify.locale.t('$vuetify.home.menu.deckManagement') }}</div>
                 </div>
-            </RouterLink>
+                <!-- DECK VIEWER -->
+                <DeckViewer
+                    class="deck-viewer"
+                    :class="{ 'deck-viewer-hidden': !showDeckViewer }"
+                    :show="showDeckViewer"
+                    @[ETripleTriadEvent.EditDeck]="onEditButtonClick"
+                    @[ETripleTriadEvent.AddDeck]="showDeckBuilder = true"
+                    @[ETripleTriadEvent.CloseDeckViewer]="closeDeckViewer"
+                />
+                <!-- DECK BUILDER -->
+                <v-dialog
+                    v-model="showDeckBuilder"
+                    fullscreen
+                    :scrim="false"
+                    transition="dialog-bottom-transition"
+                >
+                    <v-card class="bg-black">
+                        <v-toolbar dark color="tertiary">
+                            <v-toolbar-title class="builder-title">
+                                {{ $vuetify.locale.t('$vuetify.deck.createTitle') }}
+                            </v-toolbar-title>
+                        </v-toolbar>
+                        <DeckBuilder
+                            :deckToEdit="deckToEdit"
+                            @[ETripleTriadEvent.DeckCreated]="closeDeckBuilder"
+                            @[ETripleTriadEvent.CancelDeck]="closeDeckBuilder"
+                        />
+                    </v-card>
+                </v-dialog>
+            </div>
         </div>
     </div>
 
 </template><script lang="ts">
 import { Auth } from '@aws-amplify/auth';
 import GameModeSelector from '@/components/GameModeSelector.vue';
+import DeckBuilder from '@/components/DeckBuilder.vue';
+import DeckViewer from '@/components/DeckViewer.vue';
 import { ETripleTriadEvent } from '@/models/Event';
 import { EGameMode } from '@/models/GameMode';
 import router from '@/router';
+import type { Deck } from '@/models/Deck';
 
 export default {
-    components: { GameModeSelector },
+    components: { GameModeSelector, DeckViewer, DeckBuilder },
     data() {
         return {
             ETripleTriadEvent: ETripleTriadEvent,
             showSelectorMode: false as boolean,
-            closingSelectorMode: false as boolean
+            closingSelectorMode: false as boolean,
+            closingDeckViewer: false as boolean,
+            showDeckViewer: false as boolean,
+            showDeckBuilder: false as boolean,
+            deckToEdit: undefined as undefined | Deck
         };
     },
     methods: {
@@ -91,6 +136,12 @@ export default {
             // Otherwise, mode selector panel won't close
             const gameModeHeader: Element = document.getElementsByClassName('mode-selector-header')[0];
             this.showSelectorMode = gameModeHeader && !gameModeHeader.contains(clickEvent.target as Node);
+        },
+        onDeckButtonClicked(clickEvent: MouseEvent): void {
+            // Check that click is not emited from deck viewer header
+            // Otherwise, mode selector panel won't close
+            const deckViewerHeader: Element = document.getElementsByClassName('viewer-header')[0];
+            this.showDeckViewer = deckViewerHeader && !deckViewerHeader.contains(clickEvent.target as Node);
         },
         /**
          * Called when a game mode has been selected
@@ -118,6 +169,32 @@ export default {
             setTimeout(() => {
                 this.closingSelectorMode = false;
             }, 2000);
+        },
+        closeDeckViewer(): void {
+            this.showDeckViewer = false;
+            // Set closingDeckViewer data, it adds a class to the play button just the time of the closing animation
+            this.closingDeckViewer = true;
+            setTimeout(() => {
+                this.closingDeckViewer = false;
+            }, 2000);
+        },
+        /**
+         * Called when the edit icon of a deck has been clicked
+         * Open the Deck Builder to edit the deck
+         * @param {Deck} deckToEdit deck to edit
+         */
+        onEditButtonClick(deckToEdit: Deck) {
+            this.deckToEdit = deckToEdit;
+            this.showDeckBuilder = true;
+        },
+        /**
+         * Called when:
+         * - a deck has been created or edited
+         * - the edition in Deck Builder has been canceled
+         */
+        closeDeckBuilder() {
+            this.showDeckBuilder = false;
+            this.deckToEdit = undefined;
         }
     }
 }
@@ -125,8 +202,8 @@ export default {
 
 <style scoped lang="scss">
 $card-border-radius: 20px;
-$gamemode-transition-delay: .5s;
-$gamemode-transition: all .8s ease-in-out;
+$card-transition-delay: .5s;
+$card-transition: all .8s ease-in-out;
 .home-container {
     height: 100vh;
     display: flex;
@@ -162,6 +239,7 @@ $gamemode-transition: all .8s ease-in-out;
     padding: 0 50px;
     cursor: pointer;
     &.card-board-selected,
+    &.card-deck-selected,
     &:hover {
         transition-delay: 0s;
         transform: scale(1.1);
@@ -293,6 +371,7 @@ $gamemode-transition: all .8s ease-in-out;
     transition-delay: 0s;
     // Gradient generated with https://mycolor.space/
     background-image: linear-gradient(to right top, #222831, #3b3f5f, #6b5287, #ac5ea2, #f266ab);
+    &.card-deck-selected,
     &:hover {
         // Glow effect
         -webkit-box-shadow:0px 0px 91px 0px rgb(var(--v-theme-secondary));
@@ -300,26 +379,37 @@ $gamemode-transition: all .8s ease-in-out;
         box-shadow: 0px 0px 91px 0px rgb(var(--v-theme-secondary));
     }
 }
-.card-deck-in-animation {
+.card-deck-in-animation,
+.card-board-in-animation {
     pointer-events: none;
     user-select: none;
-    transition: $gamemode-transition;
-    transition-delay: $gamemode-transition-delay !important;
+    transition: $card-transition;
+    transition-delay: $card-transition-delay !important;
 }
-.card-deck-hidden {
-    transition: $gamemode-transition;
+.card-container-hidden {
+    transition: $card-transition;
     opacity: 0;
     transform: scale(0);
 }
 
-.game-mode-selector {
-    transition: $gamemode-transition;
-    transition-delay: $gamemode-transition-delay;
+.game-mode-selector,
+.deck-viewer {
+    transition: $card-transition;
+    transition-delay: $card-transition-delay;
 }
-.game-mode-selector-hidden {
+.game-mode-selector-hidden,
+.deck-viewer-hidden {
     transition-delay: 0s;
 }
-
+.builder-title {
+    text-align: center;
+    margin: 0;
+    text-transform: uppercase;
+    font-size: 28px;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+    font-weight: 500;
+}
 // ROTATE ANIMATION
 @-webkit-keyframes rotating /* Safari and Chrome */ {
     from {

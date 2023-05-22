@@ -4,7 +4,6 @@
         :class="{
             'mode-selector-hidden': !show,
             'mode-selector-visible': show,
-            
         }"
     >
         <div

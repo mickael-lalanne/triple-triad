@@ -93,13 +93,15 @@ import type { Deck } from '@/models/Deck';
 import { ETripleTriadEvent } from '@/models/Event';
 import { DeckService } from '@/services/deckService';
 import type { PropType } from 'vue';
+import { useDeckStore } from '@/stores/deck.store';
+import { mapState } from 'pinia';
 
 export default {
     props: {
-        deckLength: { type: Number, required: true },
         deckToEdit: { type: Object as PropType<Deck>, required: false }
     },
     computed: {
+        ...mapState(useDeckStore, ['getUserDecks']),
         editing(): boolean {
             return !!this.deckToEdit;
         }
@@ -144,12 +146,21 @@ export default {
          * Emit an event to the parent to create the deck
          */
         async createDeck() {
-            const deckToCreate: Partial<Deck> = {
-                name: this.deckName === '' ? this.$vuetify.locale.t('$vuetify.deck.defaultDeckName', this.deckLength + 1) : this.deckName,
+            const deckToCreate: Deck = {
+                name: this.deckName === '' ? this.$vuetify.locale.t('$vuetify.deck.defaultDeckName', this.getUserDecks.length + 1) : this.deckName,
                 cards: this.selectedCards.map(card => card.id),
                 id: this.editing ? this.deckToEdit?.id : undefined
-            };
-            this.$emit(ETripleTriadEvent.CreateDeck, deckToCreate, this.editing)
+            } as Deck;
+
+            
+            // TODO: show loading indicator while the base is updating
+            if (this.editing) {
+                await DeckService.updateDeck(deckToCreate);
+            }
+            else {
+                await DeckService.createDeck(deckToCreate);
+            }
+            this.$emit(ETripleTriadEvent.DeckCreated, deckToCreate, this.editing)
         }
     }
 };

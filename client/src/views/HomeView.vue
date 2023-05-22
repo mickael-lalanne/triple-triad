@@ -8,6 +8,7 @@
             v-else
             :player1Cards="player1Cards"
             :player2Cards="player2Cards"
+            @[ETripleTriadEvent.BackHome]="playing = false"
         />
     </main>
 </template>
@@ -34,8 +35,6 @@ export default {
     },
     methods: {
         playLocalMode(playersDecks: Deck[]) {
-            console.log('#playLocalMode#');
-            console.log(playersDecks);
             this.player1Cards = DeckService.resolveDeckCards(playersDecks[0].cards);
             this.player2Cards = DeckService.resolveDeckCards(playersDecks[1].cards);
             this.playing = true;

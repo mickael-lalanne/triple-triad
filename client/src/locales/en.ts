@@ -18,6 +18,10 @@ export default {
             localTitle: 'Choose a deck for',
             localTitleP1: 'Player 1',
             localTitleP2: 'Player 2'
+        },
+        deckViewer: {
+            addDeck: 'Create a new deck',
+            deleteDeck: 'Delete the deck'
         }
     },
     login: {
@@ -44,6 +48,8 @@ export default {
         cancel: 'Cancel',
         later: 'Coming later',
         next: 'Next',
-        play: 'Play'
+        play: 'Play',
+        delete: 'Delete',
+        edit: 'Edit'
     }
 }

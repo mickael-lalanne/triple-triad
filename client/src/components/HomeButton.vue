@@ -19,7 +19,8 @@
 </template>
 
 <script lang="ts">
-import router from '@/router';
+import { ETripleTriadEvent } from '@/models/Event';
+
 export const HOME_HEADER_HEIGHT = 80;
 
 export default {
@@ -42,7 +43,7 @@ export default {
             // After a delay, if the home button is still pressed, redirect to the home page
             setTimeout(() => {
                 if (this.isMouseDown) {
-                    router.push({ path: '/' });
+                    this.$emit(ETripleTriadEvent.BackHome);
                 }
             }, 1200);
         },
