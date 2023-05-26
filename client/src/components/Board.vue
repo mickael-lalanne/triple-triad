@@ -95,12 +95,10 @@
                         <div class="winner-text">{{ $vuetify.locale.t('$vuetify.board.playerWin', winner) }}</div>
                     </v-card-text>
                     <v-card-actions class="winner-buttons-container">
-                        <!-- Back to main menu -->
-                        <RouterLink class="winner-button back-button" to="/">      
-                            <v-btn>
-                                {{ $vuetify.locale.t('$vuetify.board.backToMainMenu') }}
-                            </v-btn>
-                        </RouterLink>
+                        <!-- Back to main menu -->  
+                        <v-btn class="winner-button back-button" @click="$emit(ETripleTriadEvent.BackHome)">
+                            {{ $vuetify.locale.t('$vuetify.board.backToMainMenu') }}
+                        </v-btn>
                         <!-- Replay -->     
                         <div class="winner-button replay-button" @click=replay()>
                             {{ $vuetify.locale.t('$vuetify.board.replay') }}
