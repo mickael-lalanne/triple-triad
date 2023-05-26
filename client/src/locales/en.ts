@@ -50,6 +50,7 @@ export default {
         next: 'Next',
         play: 'Play',
         delete: 'Delete',
-        edit: 'Edit'
+        edit: 'Edit',
+        create: 'Create'
     }
 }

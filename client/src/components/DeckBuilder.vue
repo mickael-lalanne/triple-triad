@@ -1,7 +1,18 @@
 <template>
-    <div class="builder-container">
+    <div class="builder-container d-flex flex-column">
+        <!-- DECK NAME -->
+        <!-- <input v-model="deckName" class="deck-name" placeholder="Deck name" title="input title"> -->
+        <v-text-field
+            v-model="deckName"
+            class="deck-name mb-4"
+            color="secondary"
+            label="Deck name"
+            variant="solo"
+            density="compact"
+            hide-details
+        ></v-text-field>
         <!-- ALL CARDS LIST (sorted by stars) -->
-        <v-expansion-panels class="panels-container" variant="accordion" multiple v-model="starPanels">
+        <v-expansion-panels class="panels-container mb-4" variant="accordion" multiple v-model="starPanels">
             <v-expansion-panel v-for="(cards, i) in allCards" :key="i" :value="i">
                 <v-expansion-panel-title class="builder-panel-title">
                     <v-icon
@@ -9,7 +20,7 @@
                         :key="star"
                         :size="25"
                         icon="mdi-star-circle"
-                        color="#DE970B"
+                        color="cardStar"
                     ></v-icon>
                 </v-expansion-panel-title>
                 <v-expansion-panel-text class="panel-content">
@@ -26,15 +37,14 @@
                 </v-expansion-panel-text>
             </v-expansion-panel>
         </v-expansion-panels>
+        <v-spacer></v-spacer>
         <!-- CREATING DECK -->
         <div class="creating-deck-container d-flex align-center justify-center">
-            <!-- DECK NAME -->
-            <input v-model="deckName" class="deck-name" placeholder="Deck name" title="input tiel">
 
-            <div class="d-flex align-center justify-center" style="position: relative">
+            <div class="d-flex align-center justify-center" style="position: relative; width: 100%;">
                 <!-- DECK CARDS -->
                 <div
-                    v-for="i in 5" :key="i" class="card-slot"
+                    v-for="i in 5" :key="i" class="card-slot d-flex"
                     @mouseenter="deckCardHover=i"
                     @mouseleave="deckCardHover = null"
                     :class="{ 'card-slot-empty': !isCardChoosen(i) }"
@@ -44,44 +54,31 @@
                         :src="'/images/cards/' + getCardSource(i)"
                     />
                     <!-- Card remover -->
-                    <div v-if="isCardChoosen(i) && deckCardHover === i" class="card-remover d-flex align-center justify-center">
-                        <v-icon
-                            class="remove-icon"
-                            :size="70"
-                            icon="mdi-selection-ellipse-remove"
-                            color="white"
-                            @click="removeCardFromDeck(i)"
+                    <div
+                        v-if="isCardChoosen(i) && deckCardHover === i"
+                        class="card-remover d-flex align-center justify-center"
+                        @click="removeCardFromDeck(i)"
+                    >
+                        <v-icon class="remove-icon" :size="40" icon="mdi-selection-remove" color="white"
                         ></v-icon>
                         <div class="remove-background"></div>
                     </div>
                 </div>
-                <!-- ACTIONS BUTTON -->
-                <div class="deck-actions">
-                    <!-- Save button -->
-                    <div
-                        class="deck-action-button"
-                        @click="createDeck"
-                        :class="{ 'deck-action-button-disabled' : selectedCards.length !== 5}"
-                    >
-                        <div class="button-icon d-flex justify-center">
-                            <v-icon
-                                :size="25"
-                                icon="mdi-content-save"
-                                color="white"
-                            ></v-icon>
-                        </div>
-                    </div>
-                    <!-- Cancel button -->
-                    <div class="deck-action-button" @click="$emit(ETripleTriadEvent.CancelDeck)">
-                        <div class="button-icon d-flex justify-center">
-                            <v-icon
-                                :size="25"
-                                icon="mdi-cancel"
-                                color="white"
-                            ></v-icon>
-                        </div>
-                    </div>
-                </div>
+            </div>
+        </div>
+        <!-- ACTIONS BUTTON -->
+        <div class="deck-actions">
+            <!-- Save button -->
+            <div
+                class="deck-action-button"
+                @click="createDeck"
+                :class="{ 'deck-action-button-disabled' : selectedCards.length !== 5}"
+            >
+                {{ $vuetify.locale.t('$vuetify.shared.create') }}
+            </div>
+            <!-- Cancel button -->
+            <div class="deck-action-button" @click="$emit(ETripleTriadEvent.CancelDeck)">
+                {{ $vuetify.locale.t('$vuetify.shared.cancel') }}
             </div>
         </div>
     </div>
@@ -170,51 +167,54 @@ export default {
 $header-height: 64px;
 $creating-deck-height: 256px;
 $card-container-height: calc(#{$header-height} + #{$creating-deck-height});
-$deck-actions-width: 125px;
 
 .builder-container {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    padding: 15px;
+}
+.panels-container {
     overflow: auto;
-    height: calc(100% - $card-container-height);
+    direction: rtl;
     &::-webkit-scrollbar {
-        width: 5px;
+        width: 2px;
     }
     &::-webkit-scrollbar-track {
         background: white;
         border-radius: 10px;
     }
     &::-webkit-scrollbar-thumb {
-        background-color: rgb(var(--v-theme-tertiary));
+        background-color: rgb(var(--v-theme-secondary));
         border-radius: 10px;
     }
-}
-.panels-container {
-    padding: 50px 20%;
-}
-.panels-container,
-.panel-content {
-
-    background-color: rgb(var(--v-theme-black));
 }
 .builder-panel-title {
     min-height: 30px !important;
     height: 30px;
+    border-bottom: 1px solid white;
+    color: white;
 }
 
 .star-category {
     flex-wrap: wrap;
+    justify-content: center;
 }
 .card-container {
-    margin: 5px;
+    margin: 5px;   
+    width: 70px;
     img {
         transition: all .2s ease-in-out;
         cursor: pointer;
+        width: 100%;
         &:hover {
-            transform: scale(1.2);
+            transform: scale(1.3);
         }
     }
 }
 .card-container-disabled {
-    // pointer-events: none;
     user-select: none;
     img {
         -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
@@ -228,57 +228,44 @@ $deck-actions-width: 125px;
 
 .creating-deck-container {
     flex-direction: column;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    z-index: 1;
-    min-height: $creating-deck-height;
-    background-color: rgb(var(--v-theme-tertiary));
-    
-    box-shadow: inset 0px 10px 15px -3px rgba(0,0,0,0.3);
+    background-color: rgb(var(--v-theme-secondary));
     width:100%;
-    padding: 35px 0;
+    padding: 7px;
 }
 .card-slot {
     position: relative;
-    width: 100px;
-    height: 126px;
-    margin: 0 10px;
+    aspect-ratio: 50 / 63;
+    margin: 0 2px;
+    flex: 1 1 0;
+    height: 100%;
+    border: 1px solid transparent;
+    border-radius: 10px;
 }
 .card-slot-empty {
-    border: 2px dotted black;
+    border: 1px solid rgb(var(--v-theme-black));
 }
 .deck-actions {
     display: flex;
-    flex-direction: column;
-    width:$deck-actions-width;
     align-items: center;
-    position: absolute;
-    right: -140px;
+    justify-content: center;
+    width: 100%;
     .deck-action-button {
         cursor: pointer;
-        border: 2px solid white;
-        border-radius: 100px;
-        width: 55px;
-        height: 55px;
-        padding: 5px;
-        transition: .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        margin: 5px 0;
-        .button-icon{
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
-            text-align:center;
+        color: white;
+        font-size: 16px;
+        margin-top: 10px;
+        padding: 5px 0;
+        border: 1px solid white;
+        flex: 1;
+        text-align: center;
+        &:first-child {
+            margin-right: 10px;
+        }
+        &:last-child {
+            margin-left: 10px;
         }
         &:hover{
-            width:$deck-actions-width;
-            background-color: white;
-            box-shadow: 0px 5px 5px rgba(0,0,0,0.2);
-            transition:.3s;
-        }
-        &:active{
-            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
-            transition: .05s
+            background-color: rgb(var(--v-theme-secondary));
         }
     }
     .deck-action-button-disabled {
@@ -295,8 +282,10 @@ $deck-actions-width: 125px;
     width: 100%;
     height: 100%;
     z-index: 1;
+    cursor: pointer;
     .remove-icon {
         z-index: 1;
+        pointer-events: none;
     }
     .remove-background {
         background-color: black;
@@ -308,14 +297,7 @@ $deck-actions-width: 125px;
     }
 }
 .deck-name {
-    width: 300px;
-    height: 40px;
-    background-color: white;
-    margin-bottom: 20px;
-    padding-left: 15px;
-    &:focus {
-        outline: 3px solid rgb(var(--v-theme-primary));
-    }
+    flex: 0;
 }
 </style>
 
@@ -323,13 +305,22 @@ $deck-actions-width: 125px;
 .builder-container {
     .v-expansion-panel__shadow {
         box-shadow: none;
-        outline: 1px solid white;
+        border: 1px solid white;
+        border-left: none;
+        border-radius: 0;
     }
     .v-expansion-panel-title__overlay {
         opacity: 0 !important;
         &:hover {
             opacity: 0.1 !important;
         }
+    }
+    .v-expansion-panel-text__wrapper {
+        padding: 5px;
+    }
+    .v-expansion-panel {
+        background: none;
+        direction: ltr;
     }
 }
 .deck-actions .deck-action-button:hover .v-icon {

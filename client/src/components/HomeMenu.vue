@@ -75,30 +75,8 @@
                     class="deck-viewer"
                     :class="{ 'deck-viewer-hidden': !showDeckViewer }"
                     :show="showDeckViewer"
-                    @[ETripleTriadEvent.EditDeck]="onEditButtonClick"
-                    @[ETripleTriadEvent.AddDeck]="showDeckBuilder = true"
                     @[ETripleTriadEvent.CloseDeckViewer]="closeDeckViewer"
                 />
-                <!-- DECK BUILDER -->
-                <v-dialog
-                    v-model="showDeckBuilder"
-                    fullscreen
-                    :scrim="false"
-                    transition="dialog-bottom-transition"
-                >
-                    <v-card class="bg-black">
-                        <v-toolbar dark color="tertiary">
-                            <v-toolbar-title class="builder-title">
-                                {{ $vuetify.locale.t('$vuetify.deck.createTitle') }}
-                            </v-toolbar-title>
-                        </v-toolbar>
-                        <DeckBuilder
-                            :deckToEdit="deckToEdit"
-                            @[ETripleTriadEvent.DeckCreated]="closeDeckBuilder"
-                            @[ETripleTriadEvent.CancelDeck]="closeDeckBuilder"
-                        />
-                    </v-card>
-                </v-dialog>
             </div>
         </div>
     </div>
@@ -106,24 +84,20 @@
 </template><script lang="ts">
 import { Auth } from '@aws-amplify/auth';
 import GameModeSelector from '@/components/GameModeSelector.vue';
-import DeckBuilder from '@/components/DeckBuilder.vue';
 import DeckViewer from '@/components/DeckViewer.vue';
 import { ETripleTriadEvent } from '@/models/Event';
 import { EGameMode } from '@/models/GameMode';
 import router from '@/router';
-import type { Deck } from '@/models/Deck';
 
 export default {
-    components: { GameModeSelector, DeckViewer, DeckBuilder },
+    components: { GameModeSelector, DeckViewer },
     data() {
         return {
             ETripleTriadEvent: ETripleTriadEvent,
             showSelectorMode: false as boolean,
             closingSelectorMode: false as boolean,
             closingDeckViewer: false as boolean,
-            showDeckViewer: false as boolean,
-            showDeckBuilder: false as boolean,
-            deckToEdit: undefined as undefined | Deck
+            showDeckViewer: false as boolean
         };
     },
     methods: {
@@ -138,10 +112,15 @@ export default {
             this.showSelectorMode = gameModeHeader && !gameModeHeader.contains(clickEvent.target as Node);
         },
         onDeckButtonClicked(clickEvent: MouseEvent): void {
-            // Check that click is not emited from deck viewer header
+            // Check that click is not emited from deck viewer header, add deck button or delete card button
             // Otherwise, mode selector panel won't close
             const deckViewerHeader: Element = document.getElementsByClassName('viewer-header')[0];
-            this.showDeckViewer = deckViewerHeader && !deckViewerHeader.contains(clickEvent.target as Node);
+            const deckBuilder: Element = document.getElementsByClassName('builder-container')[0];
+
+            this.showDeckViewer = (deckViewerHeader && !deckViewerHeader.contains(clickEvent.target as Node)) ||
+                (clickEvent.target as HTMLElement).classList.contains('add-deck-button') ||
+                (clickEvent.target as HTMLElement).classList.contains('remove-background') ||
+                (deckBuilder && deckBuilder.contains(clickEvent.target as Node));
         },
         /**
          * Called when a game mode has been selected
@@ -178,24 +157,6 @@ export default {
                 this.closingDeckViewer = false;
             }, 2000);
         },
-        /**
-         * Called when the edit icon of a deck has been clicked
-         * Open the Deck Builder to edit the deck
-         * @param {Deck} deckToEdit deck to edit
-         */
-        onEditButtonClick(deckToEdit: Deck) {
-            this.deckToEdit = deckToEdit;
-            this.showDeckBuilder = true;
-        },
-        /**
-         * Called when:
-         * - a deck has been created or edited
-         * - the edition in Deck Builder has been canceled
-         */
-        closeDeckBuilder() {
-            this.showDeckBuilder = false;
-            this.deckToEdit = undefined;
-        }
     }
 }
 </script>

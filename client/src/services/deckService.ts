@@ -48,10 +48,11 @@ export class DeckService {
             userId: AuthenticatorService.USER_ID
         };
 
-        const deckCreated: Deck = await API.graphql<GraphQLQuery<CreateDeckMutation>>({ 
+        const apiResponse = await API.graphql<GraphQLQuery<CreateDeckMutation>>({ 
             query: mutations.createDeck, 
             variables: { input: deckToCreate }
-        }) as Deck;
+        });
+        const deckCreated: Deck = apiResponse.data?.createDeck as Deck;
 
         // Add created deck in store
         this.deckStore.addDeck(deckCreated);

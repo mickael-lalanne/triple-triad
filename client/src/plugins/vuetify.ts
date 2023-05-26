@@ -33,7 +33,8 @@ export default createVuetify({
                     primary: '#2CD3E1',
                     secondary: '#F266AB',
                     tertiary: '#FFB84C',
-                    black: '#222831'
+                    black: '#222831',
+                    cardStar: '#E9D440'
                 }
             }
         }

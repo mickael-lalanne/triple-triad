@@ -6,80 +6,88 @@
             'deck-viewer-container-visible': show,
         }"
     >
-        <div class="viewer-header" @click="$emit(ETripleTriadEvent.CloseDeckViewer)">
-            <v-icon
-                class="mode-selector-close-icon"
-                :size="25"
-                icon="mdi-chevron-right"
-                color="white"
-            ></v-icon>
-        </div>
-        <div class="viewer-container">
-            <!-- No deck message -->
-            <div v-if="getUserDecks.length === 0" class="deck-container no-deck-container">
-                <div class="no-deck-content d-flex align-center justify-center">
-                    {{ $vuetify.locale.t('$vuetify.deck.noDeckMessageTop') }} <br>
-                    {{ $vuetify.locale.t('$vuetify.deck.noDeckMessageBot') }}
-                </div>
-                <div class="no-deck-footer">
-                    <v-icon :size="25" icon="mdi-arrow-down-thick" color="tertiary"></v-icon>
-                </div>
+        <div v-if="!showDeckBuilder" class="d-flex flex-column" style="height: inherit;">
+            <div class="viewer-header" @click="$emit(ETripleTriadEvent.CloseDeckViewer)">
+                <v-icon
+                    class="mode-selector-close-icon"
+                    :size="25"
+                    icon="mdi-chevron-right"
+                    color="white"
+                ></v-icon>
             </div>
-            <div
-                v-for="deck in getUserDecks"
-                :key="deck.id"
-                class="deck-container d-flex align-stretch"
-                @mouseenter="deckHover = deck.id"
-                @mouseleave="deckHover = undefined"
-            >
-                <!-- Deck cards -->
-                <div class="deck-cards-container d-flex align-center">
-                    <img v-for="card in getDeckCards(deck.cards)" :key="card.id" :src="'/images/cards/' + card.source"/>
-                <!-- Action buttons -->
+            <div class="viewer-container">
+                <!-- No deck message -->
+                <div v-if="getUserDecks.length === 0" class="deck-container no-deck-container">
+                    <div class="no-deck-content d-flex align-center justify-center">
+                        {{ $vuetify.locale.t('$vuetify.deck.noDeckMessageTop') }} <br>
+                        {{ $vuetify.locale.t('$vuetify.deck.noDeckMessageBot') }}
+                    </div>
+                    <div class="no-deck-footer">
+                        <v-icon :size="25" icon="mdi-arrow-down-thick" color="tertiary"></v-icon>
+                    </div>
+                </div>
                 <div
-                    class="deck-action-buttons d-flex"
-                    :class="{ 'deck-action-buttons-visible': deckHover === deck.id && !showDeleteConfirmation }"
+                    v-for="deck in getUserDecks"
+                    :key="deck.id"
+                    class="deck-container d-flex align-stretch"
+                    @mouseenter="deckHover = deck.id"
+                    @mouseleave="deckHover = undefined"
                 >
-                    <div class="actions-layer"></div>
-                    <div class="action-button" @click="$emit(ETripleTriadEvent.EditDeck, deck)">
-                        {{ $vuetify.locale.t('$vuetify.shared.edit') }}
-                    </div>
-                    <div class="action-button" @click="showDeleteConfirmation = deck.id">
-                        {{ $vuetify.locale.t('$vuetify.shared.delete') }}
-                    </div>
-                </div>
-                </div>
-                <!-- Deck name -->
-                <div class="deck-name">{{ deck.name }}</div>
-                <!-- Delete confirmation -->
-                <div v-if="showDeleteConfirmation === deck.id" class="delete-confirmation">
-                    <div class="d-flex">
-                        {{ $vuetify.locale.t('$vuetify.home.deckViewer.deleteDeck') }}
-                        <span class="delete-deck-name">"{{ deck.name }}""</span> ?
-                    </div>
-                    <div class="delete-confirm-buttons">
-                        <div class="delete" @click="confirmDelete(deck.id!)">
+                    <!-- Deck cards -->
+                    <div class="deck-cards-container d-flex align-center">
+                        <img v-for="card in getDeckCards(deck.cards)" :key="card.id" :src="'/images/cards/' + card.source"/>
+                    <!-- Action buttons -->
+                    <div
+                        class="deck-action-buttons d-flex"
+                        :class="{ 'deck-action-buttons-visible': deckHover === deck.id && !showDeleteConfirmation }"
+                    >
+                        <div class="actions-layer"></div>
+                        <div class="action-button" @click="$emit(ETripleTriadEvent.EditDeck, deck)">
+                            {{ $vuetify.locale.t('$vuetify.shared.edit') }}
+                        </div>
+                        <div class="action-button" @click="showDeleteConfirmation = deck.id">
                             {{ $vuetify.locale.t('$vuetify.shared.delete') }}
                         </div>
-                        <div class="cancel" @click="showDeleteConfirmation = undefined">
-                            {{ $vuetify.locale.t('$vuetify.shared.cancel') }}
-                        </div>
                     </div>
-                    <!-- Loading indicator -->
-                    <v-progress-linear
-                        v-if="deletionConfirmed"
-                        class="delete-loading"
-                        color="secondary"
-                        indeterminate
-                    ></v-progress-linear>
+                    </div>
+                    <!-- Deck name -->
+                    <div class="deck-name">{{ deck.name }}</div>
+                    <!-- Delete confirmation -->
+                    <div v-if="showDeleteConfirmation === deck.id" class="delete-confirmation">
+                        <div class="d-flex">
+                            {{ $vuetify.locale.t('$vuetify.home.deckViewer.deleteDeck') }}
+                            <span class="delete-deck-name">"{{ deck.name }}""</span> ?
+                        </div>
+                        <div class="delete-confirm-buttons">
+                            <div class="delete" @click="confirmDelete(deck.id!)">
+                                {{ $vuetify.locale.t('$vuetify.shared.delete') }}
+                            </div>
+                            <div class="cancel" @click="showDeleteConfirmation = undefined">
+                                {{ $vuetify.locale.t('$vuetify.shared.cancel') }}
+                            </div>
+                        </div>
+                        <!-- Loading indicator -->
+                        <v-progress-linear
+                            v-if="deletionConfirmed"
+                            class="delete-loading"
+                            color="secondary"
+                            indeterminate
+                        ></v-progress-linear>
+                    </div>
                 </div>
             </div>
+            <v-spacer></v-spacer>
+            <!-- ADD DECK BUTTON -->
+            <div class="add-deck-button" @click="showDeckBuilder = true">
+                {{ $vuetify.locale.t('$vuetify.home.deckViewer.addDeck') }}
+            </div>
         </div>
-        <v-spacer></v-spacer>
-        <!-- ADD DECK BUTTON -->
-        <div class="add-deck-button" @click="$emit(ETripleTriadEvent.AddDeck)">
-            {{ $vuetify.locale.t('$vuetify.home.deckViewer.addDeck') }}
-        </div>
+        <DeckBuilder
+            v-else
+            :deckToEdit="deckToEdit"
+            @[ETripleTriadEvent.DeckCreated]="closeDeckBuilder"
+            @[ETripleTriadEvent.CancelDeck]="closeDeckBuilder"
+        />
     </div>
 </template>
 
@@ -89,8 +97,11 @@ import { ETripleTriadEvent } from '@/models/Event';
 import { DeckService } from '@/services/deckService';
 import { useDeckStore } from '@/stores/deck.store';
 import { mapState } from 'pinia';
+import DeckBuilder from '@/components/DeckBuilder.vue';
+import type { Deck } from '@/models/Deck';
 
 export default {
+    components: { DeckBuilder },
     props: {
         show: { type: Boolean, default: () => false }
     },
@@ -99,7 +110,9 @@ export default {
             ETripleTriadEvent: ETripleTriadEvent,
             deckHover: undefined as undefined | string,
             showDeleteConfirmation: undefined as string | undefined,
-            deletionConfirmed: false as boolean
+            deletionConfirmed: false as boolean,
+            deckToEdit: undefined as undefined | Deck,
+            showDeckBuilder: false as boolean
         };
     },
     computed: {
@@ -122,6 +135,24 @@ export default {
             await DeckService.deleteDeck(deckId);
             this.showDeleteConfirmation = undefined;
             this.deletionConfirmed = false;
+        },
+        /**
+         * Called when the edit icon of a deck has been clicked
+         * Open the Deck Builder to edit the deck
+         * @param {Deck} deckToEdit deck to edit
+         */
+        onEditButtonClick(deckToEdit: Deck) {
+            this.deckToEdit = deckToEdit;
+            this.showDeckBuilder = true;
+        },
+        /**
+         * Called when:
+         * - a deck has been created or edited
+         * - the edition in Deck Builder has been canceled
+         */
+        closeDeckBuilder() {
+            this.showDeckBuilder = false;
+            this.deckToEdit = undefined;
         }
     }
 };
@@ -152,6 +183,9 @@ export default {
 .viewer-header {
     cursor: pointer;
     margin-bottom: 10px;
+    &:hover i::before {
+        color: rgb(var(--v-theme-secondary));
+    }
 }
 .viewer-container {
     min-height: 0;
