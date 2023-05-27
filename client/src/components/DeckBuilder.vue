@@ -1,7 +1,6 @@
 <template>
     <div class="builder-container d-flex flex-column">
         <!-- DECK NAME -->
-        <!-- <input v-model="deckName" class="deck-name" placeholder="Deck name" title="input title"> -->
         <v-text-field
             v-model="deckName"
             class="deck-name mb-4"
@@ -157,19 +156,16 @@ export default {
             else {
                 await DeckService.createDeck(deckToCreate);
             }
-            this.$emit(ETripleTriadEvent.DeckCreated, deckToCreate, this.editing)
+            this.$emit(ETripleTriadEvent.DeckCreated, deckToCreate, this.editing);
         }
     }
 };
 </script>
 
 <style scoped lang="scss">
-$header-height: 64px;
-$creating-deck-height: 256px;
-$card-container-height: calc(#{$header-height} + #{$creating-deck-height});
-
 .builder-container {
     height: 100%;
+    width: 100%;
     position: absolute;
     top: 0;
     left: 0;

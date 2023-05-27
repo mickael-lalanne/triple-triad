@@ -70,12 +70,12 @@
                 <div class="card-content">
                     <div class="card-title">{{ $vuetify.locale.t('$vuetify.home.menu.deckManagement') }}</div>
                 </div>
-                <!-- DECK VIEWER -->
-                <DeckViewer
-                    class="deck-viewer"
-                    :class="{ 'deck-viewer-hidden': !showDeckViewer }"
+                <!-- DECK SECTION -->
+                <DeckSection
+                    class="deck-section"
+                    :class="{ 'deck-section-hidden': !showDeckViewer }"
                     :show="showDeckViewer"
-                    @[ETripleTriadEvent.CloseDeckViewer]="closeDeckViewer"
+                    @[ETripleTriadEvent.CloseDeckSection]="closeDeckSection"
                 />
             </div>
         </div>
@@ -84,13 +84,13 @@
 </template><script lang="ts">
 import { Auth } from '@aws-amplify/auth';
 import GameModeSelector from '@/components/GameModeSelector.vue';
-import DeckViewer from '@/components/DeckViewer.vue';
+import DeckSection from '@/components/DeckSection.vue';
 import { ETripleTriadEvent } from '@/models/Event';
 import { EGameMode } from '@/models/GameMode';
 import router from '@/router';
 
 export default {
-    components: { GameModeSelector, DeckViewer },
+    components: { GameModeSelector, DeckSection },
     data() {
         return {
             ETripleTriadEvent: ETripleTriadEvent,
@@ -149,7 +149,7 @@ export default {
                 this.closingSelectorMode = false;
             }, 2000);
         },
-        closeDeckViewer(): void {
+        closeDeckSection(): void {
             this.showDeckViewer = false;
             // Set closingDeckViewer data, it adds a class to the play button just the time of the closing animation
             this.closingDeckViewer = true;
@@ -354,12 +354,12 @@ $card-transition: all .8s ease-in-out;
 }
 
 .game-mode-selector,
-.deck-viewer {
+.deck-section {
     transition: $card-transition;
     transition-delay: $card-transition-delay;
 }
 .game-mode-selector-hidden,
-.deck-viewer-hidden {
+.deck-section-hidden {
     transition-delay: 0s;
 }
 .builder-title {

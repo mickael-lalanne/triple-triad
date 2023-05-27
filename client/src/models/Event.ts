@@ -13,8 +13,9 @@ export enum ETripleTriadEvent {
     PlayLocalMode = 'play-local-mode',
     CloseDeckSelector = 'close-deck-selector',
     /**
-     * DECK VIEWER
+     * DECK SECTION
      */
+    CloseDeckSection = 'close-deck-section',
     CloseDeckViewer = 'close-deck-viewer',
     /**
      * HOME BUTTON
