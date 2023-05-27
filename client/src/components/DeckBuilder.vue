@@ -9,9 +9,10 @@
             variant="solo"
             density="compact"
             hide-details
+            :disabled="showLoading"
         ></v-text-field>
         <!-- ALL CARDS LIST (sorted by stars) -->
-        <v-expansion-panels class="panels-container mb-4" variant="accordion" multiple v-model="starPanels">
+        <v-expansion-panels class="panels-container mb-4" variant="accordion" multiple v-model="starPanels" :disabled="showLoading">
             <v-expansion-panel v-for="(cards, i) in allCards" :key="i" :value="i">
                 <v-expansion-panel-title class="builder-panel-title">
                     <v-icon
@@ -54,7 +55,7 @@
                     />
                     <!-- Card remover -->
                     <div
-                        v-if="isCardChoosen(i) && deckCardHover === i"
+                        v-if="isCardChoosen(i) && deckCardHover === i && !showLoading"
                         class="card-remover d-flex align-center justify-center"
                         @click="removeCardFromDeck(i)"
                     >
@@ -70,13 +71,26 @@
             <!-- Save button -->
             <div
                 class="deck-action-button"
+                :class="{ 'deck-action-button-disabled': selectedCards.length !== 5 }"
                 @click="createDeck"
-                :class="{ 'deck-action-button-disabled' : selectedCards.length !== 5}"
             >
-                {{ $vuetify.locale.t('$vuetify.shared.create') }}
+                <span v-if="showLoading" class="loading-spacer"></span>
+                {{ saveButtonWording }}
+                <!-- Loading indicator -->
+                <v-progress-circular
+                    v-if="showLoading"
+                    :width="2"
+                    class="loading-indicator"
+                    color="secondary"
+                    indeterminate
+                ></v-progress-circular>
             </div>
             <!-- Cancel button -->
-            <div class="deck-action-button" @click="$emit(ETripleTriadEvent.CancelDeck)">
+            <div
+                class="deck-action-button"
+                :class="{ 'deck-action-button-disabled': showLoading }"
+                @click="$emit(ETripleTriadEvent.CancelDeck)"
+            >
                 {{ $vuetify.locale.t('$vuetify.shared.cancel') }}
             </div>
         </div>
@@ -100,6 +114,11 @@ export default {
         ...mapState(useDeckStore, ['getUserDecks']),
         editing(): boolean {
             return !!this.deckToEdit;
+        },
+        saveButtonWording(): boolean {
+            return this.editing
+                ? this.$vuetify.locale.t('$vuetify.shared.edit')
+                : this.$vuetify.locale.t('$vuetify.shared.create');
         }
     },
     data() {
@@ -109,7 +128,8 @@ export default {
             deckCardHover: null as null | number,
             selectedCards: [] as Card[],
             deckName: '' as string,
-            allCards: [ONE_STAR_CARDS, TWO_STAR_CARDS, THREE_STAR_CARDS, FOUR_STAR_CARDS, FIVE_STAR_CARDS] as Card[][]
+            allCards: [ONE_STAR_CARDS, TWO_STAR_CARDS, THREE_STAR_CARDS, FOUR_STAR_CARDS, FIVE_STAR_CARDS] as Card[][],
+            showLoading: false as boolean
         };
     },
     beforeMount() {
@@ -142,14 +162,16 @@ export default {
          * Emit an event to the parent to create the deck
          */
         async createDeck() {
+            if(this.showLoading) { return; }
+
             const deckToCreate: Deck = {
                 name: this.deckName === '' ? this.$vuetify.locale.t('$vuetify.deck.defaultDeckName', this.getUserDecks.length + 1) : this.deckName,
                 cards: this.selectedCards.map(card => card.id),
                 id: this.editing ? this.deckToEdit?.id : undefined
             } as Deck;
 
-            
-            // TODO: show loading indicator while the base is updating
+            this.showLoading = true;
+
             if (this.editing) {
                 await DeckService.updateDeck(deckToCreate);
             }
@@ -253,7 +275,10 @@ export default {
         padding: 5px 0;
         border: 1px solid white;
         flex: 1;
-        text-align: center;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         &:first-child {
             margin-right: 10px;
         }
@@ -271,6 +296,11 @@ export default {
         filter: grayscale(100%);
         opacity: 0.5;
     }
+}
+.loading-indicator,
+.loading-spacer {
+    width: 20px;
+    margin: 0 10px;
 }
 .card-remover {
     position: absolute;
