@@ -10,6 +10,7 @@ interface DeckStoreActions {
     addDeck(deckToAdd: Deck): void;
     updateDeck(userDecks: Deck): void;
     deleteDeck(deckId: string): void;
+    reset(): void;
 }
 
 interface DeckStoreGetters {
@@ -58,6 +59,12 @@ export const useDeckStore = defineStore('decks', {
          */
         deleteDeck(deckId: string) {
             this.userDecks = this.userDecks.filter(deck => deck.id !== deckId);
+        },
+        /**
+         * Called when the user logs out
+         */
+        reset() {
+            this.userDecks = [];
         }
     }
 });

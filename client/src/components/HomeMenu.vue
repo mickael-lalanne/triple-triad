@@ -88,6 +88,7 @@ import DeckSection from '@/components/DeckSection.vue';
 import { ETripleTriadEvent } from '@/models/Event';
 import { EGameMode } from '@/models/GameMode';
 import router from '@/router';
+import { DeckService } from '@/services/deckService';
 
 export default {
     components: { GameModeSelector, DeckSection },
@@ -102,6 +103,8 @@ export default {
     },
     methods: {
         async logout(): Promise<void> {
+            // Remove cards from store
+            DeckService.deckStore.reset();
             await Auth.signOut();
             this.$router.push({ path: '/login'});
         },
