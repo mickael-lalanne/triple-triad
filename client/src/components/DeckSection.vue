@@ -8,6 +8,8 @@
     >
         <DeckViewer
             v-if="!showDeckBuilder"
+            class="deck-viewer"
+            :class="{ 'deck-viewer-closing': showViewerCloseAnimation }"
             @[ETripleTriadEvent.EditDeck]="editDeck"
             @[ETripleTriadEvent.AddDeck]="closeViewerAndShowBuilder"
             @[ETripleTriadEvent.CloseDeckSection]="$emit(ETripleTriadEvent.CloseDeckSection)"

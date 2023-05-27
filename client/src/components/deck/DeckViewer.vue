@@ -1,12 +1,14 @@
 <template>
     <div class="viewer-container d-flex flex-column">
-        <div class="viewer-header" @click="$emit(ETripleTriadEvent.CloseDeckSection)">
+        <div class="viewer-header d-flex" @click="$emit(ETripleTriadEvent.CloseDeckSection)">
             <v-icon
                 class="mode-selector-close-icon"
                 :size="25"
                 icon="mdi-chevron-right"
                 color="white"
             ></v-icon>
+            <v-spacer></v-spacer>
+            <span>{{ $vuetify.locale.t('$vuetify.home.deckViewer.headerTitle') }}</span>
         </div>
         <div class="deck-list-container">
             <!-- No deck message -->
@@ -132,6 +134,9 @@ export default {
     padding: 20px;
 }
 .viewer-header {
+    color: white;
+    font-size: 19px;
+    font-style: italic;
     cursor: pointer;
     margin-bottom: 10px;
     &:hover i::before {

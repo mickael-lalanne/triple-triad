@@ -20,6 +20,7 @@ export default {
             localTitleP2: 'Player 2'
         },
         deckViewer: {
+            headerTitle: 'Add, edit or delete your decks',
             addDeck: 'Create a new deck',
             deleteDeck: 'Delete the deck'
         }
