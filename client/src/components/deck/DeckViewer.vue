@@ -12,13 +12,12 @@
         </div>
         <div class="deck-list-container">
             <!-- No deck message -->
-            <div v-if="getUserDecks.length === 0" class="deck-container no-deck-container">
-                <div class="no-deck-content d-flex align-center justify-center">
-                    {{ $vuetify.locale.t('$vuetify.deck.noDeckMessageTop') }} <br>
+            <div v-if="getUserDecks.length === 0" class="no-deck-container">
+                <v-divider class="mb-3" color="white"></v-divider>
+                {{ $vuetify.locale.t('$vuetify.deck.noDeckMessageTop') }} <br>
+                <div>
+                    <v-icon :size="20" icon="mdi-arrow-down-thick" color="white"></v-icon>
                     {{ $vuetify.locale.t('$vuetify.deck.noDeckMessageBot') }}
-                </div>
-                <div class="no-deck-footer">
-                    <v-icon :size="25" icon="mdi-arrow-down-thick" color="tertiary"></v-icon>
                 </div>
             </div>
             <div
@@ -176,23 +175,11 @@ export default {
     justify-content: center;
     font-family: 'Roboto', sans-serif;
     color: white;
-    font-size: 20px;
+    font-size: 16px;
     background-color: unset;
     border-radius: 0;
     padding: 0;
-}
-.no-deck-content {
-    flex: 1;
-    border: 1px solid white;
-    border-bottom: none;
-}
-.no-deck-footer {
-    height: 35px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgb(var(--v-theme-tertiary));
+    margin-top: 20px;
 }
 .deck-cards-container {
     z-index: 1;

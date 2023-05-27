@@ -15,6 +15,8 @@ export default {
             online: 'Online'
         },
         deckSelector: {
+            noDeckMessage: 'You haven\'t created a deck yet.',
+            playWithRandomDeckMessage: 'Play with random cards or create your own deck.',
             localTitle: 'Choose a deck for',
             localTitleP1: 'Player 1',
             localTitleP2: 'Player 2'

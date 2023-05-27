@@ -20,8 +20,13 @@
                 {{ headerWording }}
             </span>
         </div>
-        <!-- User decks -->
         <div class="deck-selector-content">
+            <!-- No deck message -->
+            <div v-if="userDecks.length === 0" class="no-deck-message ml-2">
+                {{ $vuetify.locale.t('$vuetify.home.deckSelector.noDeckMessage') }} <br>
+                {{ $vuetify.locale.t('$vuetify.home.deckSelector.playWithRandomDeckMessage') }} 
+            </div>
+            <!-- User decks -->
             <div
                 v-for="deck in userDecks"
                 :key="deck.id"
@@ -38,8 +43,25 @@
                     :src="'/images/cards/' + card.source"
                 />
             </div>
+            <!-- Random deck -->
+            <div
+                class="deck-container"
+                :class="{
+                    'deck-container-p1-selected': isP1DeckSelected(currentRandomDeck.id!),
+                    'deck-container-p2-selected': isP2DeckSelected(currentRandomDeck.id!)
+                }"
+                @click="selectDeck(currentRandomDeck)"
+            >
+                <div v-for="i in 5" :key="i" class="random-card d-flex align-center justify-center">
+                    <v-icon
+                        :size="25"
+                        icon="mdi-help"
+                        color="white"
+                    ></v-icon>
+                </div>
+            </div>
         </div>
-
+        <v-spacer></v-spacer>
         <!-- Actions button -->
         <div class="actions-buttons-container">
             <!-- Previous -->
@@ -90,7 +112,9 @@ export default {
             step: ELocalStep.SelectPlayer1Deck as ELocalStep,
             player1Deck: undefined as undefined | Deck,
             player2Deck: undefined as undefined | Deck,
-            hideAnimation: false as boolean
+            hideAnimation: false as boolean,
+            p1RandomDeck: DeckService.generateRandomDeck() as Deck,
+            p2RandomDeck: DeckService.generateRandomDeck() as Deck
         };
     },
     computed: {
@@ -103,6 +127,11 @@ export default {
             return this.step === ELocalStep.SelectPlayer1Deck
                 ? this.$vuetify.locale.t('$vuetify.home.deckSelector.localTitleP1')
                 : this.$vuetify.locale.t('$vuetify.home.deckSelector.localTitleP2');
+        },
+        currentRandomDeck(): Deck {
+            return this.step === ELocalStep.SelectPlayer1Deck
+                ? this.p1RandomDeck
+                : this.p2RandomDeck;
         }
     },
     beforeMount() {
@@ -196,6 +225,7 @@ export default {
     min-height: 0;
     display: flex;
     flex-direction: column;
+    flex: 1;
     animation-name: showDeckSelector;
     animation-duration: 1.5s;
     // Fix blur when animation
@@ -211,6 +241,7 @@ export default {
     overflow: auto;
     padding-left: 5px;
     direction: rtl;
+    overflow-y: scroll;
     &::-webkit-scrollbar {
         width: 3px;
     }
@@ -220,6 +251,12 @@ export default {
     &::-webkit-scrollbar-thumb {
         background-color: rgb(var(--v-theme-primary));
     }
+}
+.no-deck-message {
+    color: white;
+    direction: ltr;
+    font-size: 12px;
+    margin-bottom: 5px;
 }
 .deck-container {
     display: flex;
@@ -243,6 +280,14 @@ export default {
     }
     img {
         min-width: 0;
+    }
+    .random-card {
+        border: 1px solid white;
+        flex: 1;
+        margin: 0 5px;
+        aspect-ratio: 50 / 63;
+        border-radius: 15px;
+        background-color: rgb(var(--v-theme-black));
     }
 }
 .deck-selector-header {

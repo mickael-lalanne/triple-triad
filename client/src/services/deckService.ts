@@ -7,22 +7,28 @@ import * as mutations from '@/graphql/mutations';
 import * as queries from '@/graphql/queries';
 import { AuthenticatorService } from "./authenticatorService";
 import { type DeckStore } from "@/stores/deck.store";
+import { v4 as uuidv4 } from 'uuid';
 
 export class DeckService {
     public static deckStore: DeckStore;
 
     /**
      * A deck consists of one 1 star, one 2 stars, one 3 stars, one 4 stars and one 5 stars card
-     * @returns {Card[]} a random deck}
+     * @returns {Deck} a random deck}
      */
-    static generateRandomDeck(): Card[] {
-        const oneStarCard: Card = ONE_STAR_CARDS[Math.floor(Math.random() * ONE_STAR_CARDS.length)];
-        const twoStarCard: Card = TWO_STAR_CARDS[Math.floor(Math.random() * TWO_STAR_CARDS.length)];
-        const threeStarCard: Card = THREE_STAR_CARDS[Math.floor(Math.random() * THREE_STAR_CARDS.length)];
-        const fourStarCard: Card = FOUR_STAR_CARDS[Math.floor(Math.random() * FOUR_STAR_CARDS.length)];
-        const fiveStarCard: Card = FIVE_STAR_CARDS[Math.floor(Math.random() * FIVE_STAR_CARDS.length)];
-        
-        return [oneStarCard, twoStarCard, threeStarCard, fourStarCard, fiveStarCard];
+    static generateRandomDeck(): Deck {
+        const oneStarCard: number = ONE_STAR_CARDS[Math.floor(Math.random() * ONE_STAR_CARDS.length)].id;
+        const twoStarCard: number = TWO_STAR_CARDS[Math.floor(Math.random() * TWO_STAR_CARDS.length)].id;
+        const threeStarCard: number = THREE_STAR_CARDS[Math.floor(Math.random() * THREE_STAR_CARDS.length)].id;
+        const fourStarCard: number = FOUR_STAR_CARDS[Math.floor(Math.random() * FOUR_STAR_CARDS.length)].id;
+        const fiveStarCard: number = FIVE_STAR_CARDS[Math.floor(Math.random() * FIVE_STAR_CARDS.length)].id;
+
+        return {
+            id: uuidv4(),
+            name: 'Random',
+            cards: [oneStarCard, twoStarCard, threeStarCard, fourStarCard, fiveStarCard],
+            userId: ''
+        };
     }
 
     /**
