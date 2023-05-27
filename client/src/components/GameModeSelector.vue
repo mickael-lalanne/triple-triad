@@ -36,14 +36,14 @@
             <!-- AI button -->
             <div class="mode-button mode-button-disabled">
                 {{ $vuetify.locale.t('$vuetify.home.modeSelector.ai') }}
-                <v-tooltip activator="parent" location="bottom">
+                <v-tooltip activator="parent" location="bottom" :disabled="!show">
                     {{ $vuetify.locale.t('$vuetify.shared.later') }}
                 </v-tooltip>
             </div>
             <!-- Online button -->
             <div class="mode-button mode-button-disabled">
                 {{ $vuetify.locale.t('$vuetify.home.modeSelector.online') }}
-                <v-tooltip activator="parent" location="bottom">
+                <v-tooltip activator="parent" location="bottom" :disabled="!show">
                     {{ $vuetify.locale.t('$vuetify.shared.later') }}
                 </v-tooltip>
             </div>
