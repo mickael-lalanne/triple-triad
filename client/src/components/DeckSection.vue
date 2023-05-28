@@ -101,10 +101,10 @@ export default {
 
 .deck-section-container-hidden {
     opacity: 0;
+    transform: translateX(100%);
 }
 .deck-section-container-visible {
     opacity: 1;
-    transform: translateX(-100%);
 }
 .deck-viewer,
 .deck-builder {

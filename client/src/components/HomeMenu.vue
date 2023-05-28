@@ -71,12 +71,16 @@
                     <div class="card-title">{{ $vuetify.locale.t('$vuetify.home.menu.deckManagement') }}</div>
                 </div>
                 <!-- DECK SECTION -->
-                <DeckSection
-                    class="deck-section"
-                    :class="{ 'deck-section-hidden': !showDeckViewer }"
-                    :show="showDeckViewer"
-                    @[ETripleTriadEvent.CloseDeckSection]="closeDeckSection"
-                />
+                <!-- Without this wrapper, we would see the deck section 
+                    in the card background during the animation -->
+                <div class="deck-section-wrapper" :class="{ 'deck-section-wrapper-hidden': !showDeckViewer }">
+                    <DeckSection
+                        class="deck-section"
+                        :class="{ 'deck-section-hidden': !showDeckViewer }"
+                        :show="showDeckViewer"
+                        @[ETripleTriadEvent.CloseDeckSection]="closeDeckSection"
+                    />
+                </div>
             </div>
         </div>
     </div>
@@ -341,6 +345,18 @@ $card-transition: all .8s ease-in-out;
 .deck-section {
     transition: $card-transition;
     transition-delay: $card-transition-delay;
+}
+.deck-section-wrapper {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+    &-hidden {
+        visibility: hidden;
+    }
 }
 .game-mode-selector-hidden,
 .deck-section-hidden {
