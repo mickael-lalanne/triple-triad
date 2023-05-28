@@ -25,7 +25,10 @@ export const useDeckStore = defineStore('decks', {
     }),
     getters: {
         getUserDecks(state): Deck[] {
-            return state.userDecks;
+            // Sort decks by creation date
+            return state.userDecks.sort((a, b) => {
+                return new Date(a.createdAt!).valueOf() - new Date(b.createdAt!).valueOf()
+            });
         },
     },
     actions: {
