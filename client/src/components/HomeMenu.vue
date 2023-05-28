@@ -86,7 +86,6 @@ import { Auth } from '@aws-amplify/auth';
 import GameModeSelector from '@/components/GameModeSelector.vue';
 import DeckSection from '@/components/DeckSection.vue';
 import { ETripleTriadEvent } from '@/models/Event';
-import { EGameMode } from '@/models/GameMode';
 import router from '@/router';
 import { DeckService } from '@/services/deckService';
 
@@ -106,7 +105,7 @@ export default {
             // Remove cards from store
             DeckService.deckStore.reset();
             await Auth.signOut();
-            this.$router.push({ path: '/login'});
+            router.push({ path: '/login'});
         },
         onPlayButtonClicked(clickEvent: MouseEvent): void {
             // Check that click is not emited from game mode header
@@ -124,25 +123,6 @@ export default {
                 (clickEvent.target as HTMLElement).classList.contains('add-deck-button') ||
                 (clickEvent.target as HTMLElement).classList.contains('remove-background') ||
                 (deckBuilder && deckBuilder.contains(clickEvent.target as Node));
-        },
-        /**
-         * Called when a game mode has been selected
-         * @param {EGameMode} gameMode can be local, ai or online
-         */
-        onGameModeSelected(gameMode: EGameMode): void {
-            switch (gameMode) {
-                case EGameMode.local:
-                    router.push({ path: '/board' });
-                    break;
-            
-                case EGameMode.ai:
-                    // TODO
-                    break;
-
-                case EGameMode.online:
-                    // TODO
-                    break;
-            }
         },
         closeGameModeSelector(): void {
             this.showSelectorMode = false;

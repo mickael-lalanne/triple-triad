@@ -47,6 +47,28 @@ export default {
         noDeckMessageTop: `You haven't made any decks yet.`,
         noDeckMessageBot: 'Click on the button bellow!'
     },
+    error: {
+        browser: {
+            title: 'You seem to be using an unsupported browser.',
+            subtitle: 'At the moment, only Chrome is supported by the game.',
+            footer: `To see what's browsers will be supported next, take a look at the roadmap by clicking`
+        },
+        resolution: {
+            title: 'Current resolution is not supported yet.',
+            subtitle: 'To play the game, enlarge the size of the window or use a screen with a higher resolution.',
+            footer1: 'Responsive and mobile support is planned.',
+            footer2: 'Please, take a look at the roadmap by clicking'
+        },
+        roadmapButton: 'there'
+    },
+    roadmap: {
+        title: 'Triple Triad Roadmap',
+        aiMode: 'AI mode',
+        onlineMode: 'Online mode',
+        googleAuthentication: 'Google authentication',
+        responsive: 'Responsive for mobile and tablets',
+        android: 'Android application'
+    },
     shared: {
         cancel: 'Cancel',
         later: 'Coming later',

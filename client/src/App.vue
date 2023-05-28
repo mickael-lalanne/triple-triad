@@ -1,22 +1,53 @@
+<template>
+    <ErrorMessage v-if="error && $route.name !== 'roadmap'" :error="error"/>
+    <RouterView />
+</template>
+
 <script lang="ts">
 import { RouterView } from 'vue-router';
 import { AuthenticatorService } from '@/services/authenticatorService';
 import { DeckService } from '@/services/deckService';
-import { useDeckStore } from "@/stores/deck.store";
+import { useDeckStore } from '@/stores/deck.store';
+import ErrorMessage from '@/components/ErrorMessage.vue';
+import { ETripleTriadError } from './models/Error';
+import { isBrowserSupported, isResolutionSupported } from './services/utils';
 
 export default {
-    components: { RouterView },
+    components: { RouterView, ErrorMessage },
+    data() {
+        return {
+            error: undefined as ETripleTriadError | undefined
+        };
+    },
     async beforeMount() {
+        // Check browser and resolution
+        if (!isBrowserSupported()) {
+            this.error = ETripleTriadError.Browser;
+        } else if (!isResolutionSupported()) {
+            this.error = ETripleTriadError.Resolution;
+        }
+        addEventListener('resize', this.onWindowResize);
+
         await AuthenticatorService.init();
         DeckService.deckStore = useDeckStore() as any;
         DeckService.getUserDecks();
+    },
+    beforeUnmount() {
+        window.removeEventListener('resize', this.onWindowResize);
+    },
+    methods: {
+        /**
+         * Called when the window is resized
+         * Check if the resolution is still supported, display an error message if necessary
+         */
+        onWindowResize(): void {
+            if (this.error !== ETripleTriadError.Browser) {
+                this.error = isResolutionSupported() ? undefined : ETripleTriadError.Resolution;
+            }
+        }
     }
 }
 </script>
-
-<template>
-    <RouterView />
-</template>
 
 <style scoped>
 header {
