@@ -154,6 +154,7 @@ $card-transition: all .8s ease-in-out;
     align-items: center;
     flex-direction: column;
     justify-content: center;
+    overflow: hidden;
 }
 .home-header {
     color: white;

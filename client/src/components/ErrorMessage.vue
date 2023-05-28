@@ -92,7 +92,7 @@ export default {
     font-size: 45px;
     font-weight: 500;
     margin-bottom: 25px;
-        color: rgb(var(--v-theme-primary));
+    color: rgb(var(--v-theme-primary));
 }
 .error-subtitle {
     font-size: 20px;
@@ -127,6 +127,21 @@ export default {
     height: auto;
     &::before {
         font-size: 15vw;
+    }
+}
+
+@media (max-width: 768px) {
+    .error-title {
+        font-size: 32px;
+    }
+    .error-subtitle {
+        font-size: 17px;
+    }
+    .resolution-icon::before {
+        font-size: 25vw;
+    }
+    .error-footer {
+        font-size: 14px;
     }
 }
 </style>
