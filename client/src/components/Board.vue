@@ -56,6 +56,7 @@
                 :group="{ name: 'card', pull: 'clone', put: false }"
                 @start="drag = true"
                 @end="drag = false"
+                :sort="false"
                 item-key="id"
                 class="deck-container"
                 :class="{
