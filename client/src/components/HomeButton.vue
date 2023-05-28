@@ -45,7 +45,7 @@ export default {
                 if (this.isMouseDown) {
                     this.$emit(ETripleTriadEvent.BackHome);
                 }
-            }, 1200);
+            }, 1500);
         },
         onHomeButtonMouseup(): void {
             this.isMouseDown = false;
@@ -104,7 +104,7 @@ $home-header-height: 80px;
             opacity: 1;
         }
         .home-button-bg-circle {
-            transform: scale(160);
+            width: 100% !important;
         }
         .home-button-text {
             opacity: 1;
@@ -124,10 +124,10 @@ $home-header-height: 80px;
         z-index: -1;
         .home-button-bg-circle {
             width: 10px;
-            height: 10px;
             border-radius: 50%;
             background-color: white;
             transition: all 1.5s ease;
+            aspect-ratio: 1 / 1;
         }
     }
 }
