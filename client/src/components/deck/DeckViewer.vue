@@ -104,20 +104,17 @@ export default {
         getDeckCards(cardsIds: number[]): Card[] {
             return DeckService.resolveDeckCards(cardsIds);
         },
+        /**
+         * Called when the deletion of a deck has been confirmed
+         * Delete deck server side and client side
+         * @param {Deck} deckId id of the deck to delete
+         */
         async confirmDelete(deckId: string): Promise<void> {
             this.deletionConfirmed = true; // Show loading indicator
             await DeckService.deleteDeck(deckId);
-        },
-        /**
-         * Called when the delete icon of a deck has been clicked
-         * Delete deck client side and server side
-         * @param {Deck} deckId id of the deck to delete
-         */
-        async deleteDeck(deckId: string) {
-            await DeckService.deleteDeck(deckId);
             this.showDeleteConfirmation = undefined;
             this.deletionConfirmed = false;
-        },
+        }
     }
 };
 </script>
