@@ -123,6 +123,7 @@ From a technical perspective, ***AWS Amplify*** is used to:
 - [ ] Google authentication
 - [ ] Online mode
 - [ ] Android application
+- [ ] Add new rules and new cards
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

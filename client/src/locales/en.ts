@@ -62,12 +62,16 @@ export default {
         roadmapButton: 'there'
     },
     roadmap: {
+        rules: 'Button to show game\'s rules',
+        language: 'Setting to switch language between English and French',
         title: 'Triple Triad Roadmap',
         aiMode: 'AI mode',
+        themes: 'Setting to switch between dark and light theme',
         onlineMode: 'Online mode',
         googleAuthentication: 'Google authentication',
         responsive: 'Responsive for mobile and tablets',
-        android: 'Android application'
+        android: 'Android application',
+        newRules: 'Add new rules and new cards'
     },
     shared: {
         cancel: 'Cancel',

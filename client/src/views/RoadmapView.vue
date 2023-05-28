@@ -2,12 +2,52 @@
     <main class="roadmap-container">
         <div class="roadmap-title">🗺️ {{ $vuetify.locale.t('$vuetify.roadmap.title') }}</div>
         <v-spacer></v-spacer>
-        <div class="roadmap-items">
-            <v-checkbox disabled :label="'🤖 ' + $vuetify.locale.t('$vuetify.roadmap.aiMode')"></v-checkbox>
-            <v-checkbox disabled :label="'📱 ' + $vuetify.locale.t('$vuetify.roadmap.responsive')"></v-checkbox>
-            <v-checkbox disabled :label="'👨🏻‍💻 ' + $vuetify.locale.t('$vuetify.roadmap.googleAuthentication')"></v-checkbox>
-            <v-checkbox disabled :label="'📡 ' + $vuetify.locale.t('$vuetify.roadmap.onlineMode')"></v-checkbox>
-            <v-checkbox disabled :label="'📱 ' + $vuetify.locale.t('$vuetify.roadmap.android')"></v-checkbox>
+        <div class="roadmap-items mt-12">
+            <v-checkbox
+                disabled
+                density="compact"
+                :label="'❔ ' + $vuetify.locale.t('$vuetify.roadmap.rules')"
+            ></v-checkbox>
+            <v-checkbox
+                disabled
+                density="compact"
+                :label="'🥐 ' + $vuetify.locale.t('$vuetify.roadmap.language')"
+            ></v-checkbox>
+            <v-checkbox
+                disabled
+                density="compact"
+                :label="'🤖 ' + $vuetify.locale.t('$vuetify.roadmap.aiMode')"
+            ></v-checkbox>
+            <v-checkbox
+                disabled
+                density="compact"
+                :label="'🌞 ' + $vuetify.locale.t('$vuetify.roadmap.themes')"
+            ></v-checkbox>
+            <v-checkbox
+                disabled
+                density="compact"
+                :label="'📱 ' + $vuetify.locale.t('$vuetify.roadmap.responsive')"
+            ></v-checkbox>
+            <v-checkbox
+                disabled
+                density="compact"
+                :label="'👨🏻‍💻 ' + $vuetify.locale.t('$vuetify.roadmap.googleAuthentication')"
+            ></v-checkbox>
+            <v-checkbox
+                disabled
+                density="compact"
+                :label="'📡 ' + $vuetify.locale.t('$vuetify.roadmap.onlineMode')"
+            ></v-checkbox>
+            <v-checkbox
+                disabled
+                density="compact"
+                :label="'📱 ' + $vuetify.locale.t('$vuetify.roadmap.android')"
+            ></v-checkbox>
+            <v-checkbox
+                disabled
+                density="compact"
+                :label="'🎲 ' + $vuetify.locale.t('$vuetify.roadmap.newRules')"
+            ></v-checkbox>
         </div>
         <v-spacer></v-spacer>
     </main>
