@@ -23,7 +23,7 @@ export default {
     computed: {
         currentRouteName(): string {
             return router.currentRoute.value && router.currentRoute.value
-                ? router.currentRoute.value.toString()
+                ? router.currentRoute.value.name as string
                 : '';
         }
     },

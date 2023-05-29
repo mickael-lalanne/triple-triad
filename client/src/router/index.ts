@@ -32,7 +32,7 @@ router.beforeEach(async (to, from,) => {
     const isUserAuthenticated = await _isUserAuthenticated();
 
     // If user is not authenticated, redirect to the login page
-    if (to.name !== 'login' && !isUserAuthenticated) {
+    if (to.name !== 'login' && to.name !== 'roadmap' && !isUserAuthenticated) {
         return { name: 'login' };
     }
     // // If user is ahtenticated, don't display the login view
