@@ -40,7 +40,7 @@
                 <img
                     v-for="card in getDeckCards(deck.cards)"
                     :key="card.id"
-                    :src="'/images/cards/' + card.source"
+                    :src="BASE_PATH + '/images/cards/' + card.source"
                 />
             </div>
             <!-- Random deck -->
@@ -94,6 +94,7 @@ import { EGameMode } from '@/models/GameMode';
 import { DeckService } from '@/services/deckService';
 import { useDeckStore } from '@/stores/deck.store';
 import type { PropType } from 'vue';
+import { BASE_PATH } from '@/router';
 
 enum ELocalStep {
     SelectPlayer1Deck = 'select-player-1-deck',
@@ -108,6 +109,7 @@ export default {
     data() {
         return {
             ELocalStep: ELocalStep,
+            BASE_PATH: BASE_PATH,
             userDecks: [] as Deck[],
             step: ELocalStep.SelectPlayer1Deck as ELocalStep,
             player1Deck: undefined as undefined | Deck,

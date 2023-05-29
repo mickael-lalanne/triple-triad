@@ -14,7 +14,7 @@
                             'board-cell-card-player-2': getCardOwner(line, cell)
                         }"
                     >
-                        <img :src="'/images/cards/' + getCard(line, cell).source"/>
+                        <img :src="BASE_PATH + '/images/cards/' + getCard(line, cell).source"/>
                     </div>
 
                     <!-- No card in cell (drop zone) -->
@@ -69,7 +69,7 @@
                         class="deck-card d-flex align-center justify-center"
                         :class="{ 'deck-card-disabled': cardsPlayed[playerTurn].includes(element.id) }"
                     >
-                        <img :src="'/images/cards/' + element.source"/>
+                        <img :src="BASE_PATH + '/images/cards/' + element.source"/>
                     </div>
                 </template>
             </draggable>
@@ -117,6 +117,7 @@ import draggable from 'vuedraggable';
 import HomeButton, { HOME_HEADER_HEIGHT } from '@/components/HomeButton.vue';
 import type { PropType } from 'vue';
 import { ETripleTriadEvent } from '@/models/Event';
+import { BASE_PATH } from '@/router';
 
 interface BoardCell {
     card: Card;
@@ -131,6 +132,7 @@ export default {
     data() {
         return {
             ETripleTriadEvent: ETripleTriadEvent,
+            BASE_PATH: BASE_PATH,
             HOME_HEADER_HEIGHT: HOME_HEADER_HEIGHT,
             gameEnded: false as boolean,
             winner: 0 as null | 1 | 2,

@@ -20,12 +20,13 @@
         "vue": "^3.3.2",
         "vue-router": "^4.2.0",
         "vuedraggable": "^4.1.0",
-        "vuetify": "^3.2.4"
+        "vuetify": "^3.3.1"
     },
     "devDependencies": {
         "@rushstack/eslint-patch": "^1.2.0",
         "@tsconfig/node18": "^2.0.1",
         "@types/node": "^18.16.8",
+        "@types/uuid": "^9.0.1",
         "@vitejs/plugin-vue": "^4.2.3",
         "@vue/eslint-config-prettier": "^7.1.0",
         "@vue/eslint-config-typescript": "^11.0.3",

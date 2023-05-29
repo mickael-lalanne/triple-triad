@@ -29,7 +29,7 @@
             >
                 <!-- Deck cards -->
                 <div class="deck-cards-container d-flex align-center">
-                    <img v-for="card in getDeckCards(deck.cards)" :key="card.id" :src="'/images/cards/' + card.source"/>
+                    <img v-for="card in getDeckCards(deck.cards)" :key="card.id" :src="BASE_PATH + '/images/cards/' + card.source"/>
                 <!-- Action buttons -->
                 <div
                     class="deck-action-buttons d-flex"
@@ -84,14 +84,14 @@ import { ETripleTriadEvent } from '@/models/Event';
 import { DeckService } from '@/services/deckService';
 import { useDeckStore } from '@/stores/deck.store';
 import { mapState } from 'pinia';
+import { BASE_PATH } from '@/router';
 
 export default {
     name: 'DeckViewer',
-    props: {
-    },
     data() {
         return {
             ETripleTriadEvent: ETripleTriadEvent,
+            BASE_PATH: BASE_PATH,
             showDeleteConfirmation: undefined as string | undefined,
             deletionConfirmed: false as boolean,
             deckHover: undefined as undefined | string,

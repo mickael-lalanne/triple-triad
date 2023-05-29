@@ -6,11 +6,11 @@
             <div class="error-title">{{ $vuetify.locale.t('$vuetify.error.browser.title') }}</div>
             <div class="error-subtitle">{{ $vuetify.locale.t('$vuetify.error.browser.subtitle') }}</div>
             <div class="browser-container">
-                <img src="/images/browser/edge.png" class="not-supported" />
-                <img src="/images/browser/chrome.png" />
-                <img src="/images/browser/firefox.png" class="not-supported" />
-                <img src="/images/browser/safari.png" class="not-supported" />
-                <img src="/images/browser/opera.png" class="not-supported" />
+                <img :src="BASE_PATH + '/images/browser/edge.png'" class="not-supported" />
+                <img :src="BASE_PATH + '/images/browser/chrome.png'" />
+                <img :src="BASE_PATH + '/images/browser/firefox.png'" class="not-supported" />
+                <img :src="BASE_PATH + '/images/browser/safari.png'" class="not-supported" />
+                <img :src="BASE_PATH + '/images/browser/opera.png'" class="not-supported" />
             </div>
             <v-spacer></v-spacer>
             <div class="error-footer">
@@ -37,14 +37,13 @@
                 {{ $vuetify.locale.t('$vuetify.error.resolution.footer2') }}
                 <a @click="redirectToRoadmap">{{ $vuetify.locale.t('$vuetify.error.roadmapButton') }}</a>.
             </div>
-            
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { ETripleTriadError } from '@/models/Error';
-import router from '@/router';
+import router, { BASE_PATH } from '@/router';
 import type { PropType } from 'vue';
 
 export default {
@@ -54,12 +53,13 @@ export default {
     },
     data() {
         return {
-            ETripleTriadError: ETripleTriadError
+            ETripleTriadError: ETripleTriadError,
+            BASE_PATH: BASE_PATH
         };
     },
     methods: {
         redirectToRoadmap(): void {
-            router.push({ path: '/roadmap' });
+            router.push({ name: 'roadmap' });
         }
     }
 }

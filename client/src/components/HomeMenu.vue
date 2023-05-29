@@ -109,7 +109,7 @@ export default {
             // Remove cards from store
             DeckService.deckStore.reset();
             await Auth.signOut();
-            router.push({ path: '/login'});
+            router.push({ name: 'login'});
         },
         onPlayButtonClicked(clickEvent: MouseEvent): void {
             // Check that click is not emited from game mode header

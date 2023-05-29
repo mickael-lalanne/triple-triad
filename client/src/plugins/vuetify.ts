@@ -25,6 +25,8 @@ export default createVuetify({
     theme: {
         variations: {
             colors: ['primary', 'secondary'],
+            lighten: 0,
+            darken: 0
         },
         defaultTheme: 'tripleTriadTheme',
         themes: {

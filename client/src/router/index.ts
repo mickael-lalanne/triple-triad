@@ -4,21 +4,23 @@ import LoginView from '../views/LoginView.vue';
 import RoadmapView from '../views/RoadmapView.vue';
 import { Auth } from '@aws-amplify/auth';
 
+export const BASE_PATH: string = import.meta.env.PROD ? '/triple-triad' : '';
+
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-            path: '/',
+            path: BASE_PATH + '/',
             name: 'home',
             component: HomeView
         },
         {
-            path: '/login',
+            path: BASE_PATH + '/login',
             name: 'login',
             component: LoginView
         },
         {
-            path: '/roadmap',
+            path: BASE_PATH + '/roadmap',
             name: 'roadmap',
             component: RoadmapView
         }

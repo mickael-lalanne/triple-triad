@@ -31,7 +31,7 @@
                             class="card-container"
                             :class="{ 'card-container-disabled': isCardChoosen(i + 1) }"
                         >
-                            <img @click="onCardSelected(card)" :src="'/images/cards/' + card.source"/>
+                            <img @click="onCardSelected(card)" :src="BASE_PATH + '/images/cards/' + card.source"/>
                         </div>
                     </div>
                 </v-expansion-panel-text>
@@ -51,7 +51,7 @@
                 >
                     <img
                         v-if="isCardChoosen(i)"
-                        :src="'/images/cards/' + getCardSource(i)"
+                        :src="BASE_PATH + '/images/cards/' + getCardSource(i)"
                     />
                     <!-- Card remover -->
                     <div
@@ -105,6 +105,7 @@ import { DeckService } from '@/services/deckService';
 import type { PropType } from 'vue';
 import { useDeckStore } from '@/stores/deck.store';
 import { mapState } from 'pinia';
+import { BASE_PATH } from '@/router';
 
 export default {
     props: {
@@ -115,7 +116,7 @@ export default {
         editing(): boolean {
             return !!this.deckToEdit;
         },
-        saveButtonWording(): boolean {
+        saveButtonWording(): string {
             return this.editing
                 ? this.$vuetify.locale.t('$vuetify.shared.edit')
                 : this.$vuetify.locale.t('$vuetify.shared.create');
@@ -124,6 +125,7 @@ export default {
     data() {
         return {
             ETripleTriadEvent: ETripleTriadEvent,
+            BASE_PATH: BASE_PATH,
             starPanels: [0, 1, 2, 3, 4, 5] as number[],
             deckCardHover: null as null | number,
             selectedCards: [] as Card[],

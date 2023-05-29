@@ -1,5 +1,5 @@
 <template>
-    <ErrorMessage v-if="error && $route.name !== 'roadmap'" :error="error"/>
+    <ErrorMessage v-if="error && currentRouteName !== 'roadmap'" :error="error"/>
     <RouterView />
 </template>
 
@@ -11,6 +11,7 @@ import { useDeckStore } from '@/stores/deck.store';
 import ErrorMessage from '@/components/ErrorMessage.vue';
 import { ETripleTriadError } from './models/Error';
 import { isBrowserSupported, isResolutionSupported } from './services/utils';
+import router from './router';
 
 export default {
     components: { RouterView, ErrorMessage },
@@ -18,6 +19,13 @@ export default {
         return {
             error: undefined as ETripleTriadError | undefined
         };
+    },
+    computed: {
+        currentRouteName(): string {
+            return router.currentRoute.value && router.currentRoute.value
+                ? router.currentRoute.value.toString()
+                : '';
+        }
     },
     async beforeMount() {
         // Check browser and resolution

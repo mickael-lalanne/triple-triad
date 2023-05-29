@@ -18,7 +18,7 @@ Hub.listen('auth', async (data: HubCapsule) => {
         case 'signIn':
             AuthenticatorService.USER_ID = data.payload.data.attributes.sub;
             await DeckService.getUserDecks();
-            router.push({ path: '/' });
+            router.push({ name: 'home' });
             break;
         default:
             break;
